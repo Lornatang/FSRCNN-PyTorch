@@ -13,79 +13,64 @@
 # ==============================================================================
 import argparse
 import math
-import os
-import random
 
-import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
-from torch.utils.data.dataloader import DataLoader
+import torch.utils.data
+import torch.utils.data.distributed
 
+from fsrcnn_pytorch import DatasetFromFolder
 from fsrcnn_pytorch import FSRCNN
-from fsrcnn_pytorch import ValDataset
+from fsrcnn_pytorch import progress_bar
 
 parser = argparse.ArgumentParser(description="Fast Super Resolution CNN.")
-parser.add_argument("--data-file", type=str,
-                    default="./data/test/Set5_X4.h5",
-                    help="Path to data datasets. "
-                         "(default:`./data/test/Set5_X4.h5`)")
+parser.add_argument("--dataroot", type=str, default="./data/DIV2K",
+                    help="Path to datasets. (default:`./data/DIV2K`)")
+parser.add_argument("--image-size", type=int, default=256,
+                    help="Size of the data crop (squared assumed). (default:256)")
 parser.add_argument("-j", "--workers", default=0, type=int, metavar="N",
                     help="Number of data loading workers. (default:0)")
-parser.add_argument("--scale-factor", type=int, default=4,
+parser.add_argument("--scale-factor", type=int, default=4, choices=[2, 3, 4],
                     help="Low to high resolution scaling factor. (default:4).")
 parser.add_argument("--cuda", action="store_true", help="Enables cuda")
-parser.add_argument("--outf", default="./results",
-                    help="folder to output images. (default:`./results`).")
-parser.add_argument("--weights", type=str, default="weights/fsrcnn_X4.pth",
-                    required=True, help="Generator model name.  "
-                                        "(default:`weights/fsrcnn_X4.pth`)")
-parser.add_argument("--manualSeed", type=int,
-                    help="Seed for initializing training. (default:none)")
+parser.add_argument("--weights", type=str, required=True,
+                    help="Path to weights.")
 
 args = parser.parse_args()
 print(args)
 
-try:
-    os.makedirs(args.outf)
-except OSError:
-    pass
-
-if args.manualSeed is None:
-    args.manualSeed = random.randint(1, 10000)
-print("Random Seed: ", args.manualSeed)
-random.seed(args.manualSeed)
-torch.manual_seed(args.manualSeed)
-
 cudnn.benchmark = True
 
 if torch.cuda.is_available() and not args.cuda:
-    print("WARNING: You have a CUDA device, "
-          "so you should probably run with --cuda")
+    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
-dataset = ValDataset(args.eval_file)
+dataset = DatasetFromFolder(f"{args.dataroot}/val",
+                            image_size=args.image_size,
+                            scale_factor=args.scale_factor)
+
 dataloader = torch.utils.data.DataLoader(dataset,
                                          batch_size=1,
-                                         shuffle=False, pin_memory=True,
+                                         shuffle=False,
+                                         pin_memory=True,
                                          num_workers=int(args.workers))
 
 device = torch.device("cuda:0" if args.cuda else "cpu")
 
-model = FSRCNN(scale_factor=args.scale_factor).to(device)
+model = FSRCNN(num_channels=1, scale_factor=args.scale_factor).to(device)
 model.load_state_dict(torch.load(args.weights, map_location=device))
-
 criterion = nn.MSELoss().to(device)
 
-best_psnr = 0.
-
 # Test
-avg_psnr = 0
+model.eval()
+avg_psnr = 0.
 with torch.no_grad():
-    for data in dataloader:
-        inputs = data[0].to(device)
-        target = data[1].to(device)
+    for iteration, (inputs, target) in enumerate(dataloader):
+        inputs, target = inputs.to(device), target.to(device)
 
-        output = model(inputs).clamp(0.0, 1.0)
-        loss = criterion(output, target)
-        psnr = 10 * math.log10(1 / loss.item())
+        prediction = model(inputs)
+        mse = criterion(prediction, target)
+        psnr = 10 * math.log10(1 / mse.item())
         avg_psnr += psnr
-    print(f"Average PSNR: {avg_psnr / len(dataloader):.2f} dB.")
+        progress_bar(iteration, len(dataloader), f"PSNR: {avg_psnr / (iteration + 1):.2f} dB")
+
+print(f"Average PSNR: {avg_psnr / len(dataloader):.2f} dB.")
