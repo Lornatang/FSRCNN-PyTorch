@@ -11,99 +11,102 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-import numpy as np
-import torch
+import sys
+import time
+
+TOTAL_BAR_LENGTH = 50
+LAST_T = time.time()
+BEGIN_T = LAST_T
 
 
-def convert_rgb_to_y(img, dim_order="hwc"):
-    r"""Convert RGB image to Y-axis format image
+def progress_bar(current_epoch, total_epoch, current_batch, total_batch, msg=None):
+    """ A progress bar for training.
 
     Args:
-        img (PIL.Image.open): RGB image.
-        dim_order (str): Image format.
+        current_epoch (int): Number of current training epoch.
+        total_epoch (int): Total number of training epochs required.
+        current_batch (int): Number of current training batches.
+        total_batch (int): Total number of training batches required.
+        msg (str): Output information.
 
     Returns:
-        Y-axis image.
+        sys.stdout.write().
 
     """
-    if dim_order == "hwc":
-        return 16. + (
-                64.738 * img[..., 0] + 129.057 * img[..., 1] + 25.064 * img[
-            ..., 2]) / 256.
+    global LAST_T, BEGIN_T
+    if current_batch == 0:
+        BEGIN_T = time.time()  # Reset for new bar.
+
+    current_len = int(TOTAL_BAR_LENGTH * (current_batch + 1) / total_batch)
+    rest_len = int(TOTAL_BAR_LENGTH - current_len) - 1
+
+    sys.stdout.write(f"[{current_epoch + 1}/{total_epoch}][{total_batch + 1}/{total_batch}]")
+    sys.stdout.write(" [")
+    for i in range(current_len):
+        sys.stdout.write("=")
+    sys.stdout.write(">")
+    for i in range(rest_len):
+        sys.stdout.write(".")
+    sys.stdout.write("]")
+
+    current_time = time.time()
+    step_time = current_time - LAST_T
+    LAST_T = current_time
+    total_time = current_time - BEGIN_T
+
+    time_used = f"  Step time: {step_time:.2f}s"
+    time_used += f" | Total time: {total_time:.2f}s"
+    if msg:
+        time_used += " | " + msg
+
+    msg = time_used
+    sys.stdout.write(msg)
+
+    if current_batch < total_batch - 1:
+        sys.stdout.write("\r")
     else:
-        return 16. + (
-                64.738 * img[0] + 129.057 * img[1] + 25.064 * img[2]) / 256.
+        sys.stdout.write("\n")
+    sys.stdout.flush()
 
 
-def convert_rgb_to_ycbcr(img, dim_order="hwc"):
-    r"""Convert HWC image to Y-axis format image
-
-    Args:
-        img (PIL.Image.open): RGB image.
-        dim_order (str): Image format.
-
-    Returns:
-        Y-axis image.
-
-    """
-    if dim_order == "hwc":
-        y = 16. + (64.738 * img[..., 0] + 129.057 * img[..., 1] + 25.064 * img[
-            ..., 2]) / 256.
-        cb = 128. + (-37.945 * img[..., 0] - 74.494 * img[..., 1] + 112.439 *
-                     img[..., 2]) / 256.
-        cr = 128. + (
-                112.439 * img[..., 0] - 94.154 * img[..., 1] - 18.285 * img[
-            ..., 2]) / 256.
-    else:
-        y = 16. + (64.738 * img[0] + 129.057 * img[1] + 25.064 * img[2]) / 256.
-        cb = 128. + (-37.945 * img[0] - 74.494 * img[1] + 112.439 * img[
-            2]) / 256.
-        cr = 128. + (
-                112.439 * img[0] - 94.154 * img[1] - 18.285 * img[2]) / 256.
-    return np.array([y, cb, cr]).transpose([1, 2, 0])
-
-
-def convert_ycbcr_to_rgb(img, dim_order="hwc"):
-    r"""Convert Y-axis image to HWC format image
+# return the formatted time
+def format_time(seconds):
+    """ Format time
 
     Args:
-        img (PIL.Image.open): RGB image.
-        dim_order (str): Image format.
+        seconds (int): Run time in seconds.
 
     Returns:
-        H*W*C image.
+        Output a unit with run time.
 
     """
-    if dim_order == "hwc":
-        r = 298.082 * img[..., 0] / 256. + 408.583 * img[
-            ..., 2] / 256. - 222.921
-        g = 298.082 * img[..., 0] / 256. - 100.291 * img[
-            ..., 1] / 256. - 208.120 * img[..., 2] / 256. + 135.576
-        b = 298.082 * img[..., 0] / 256. + 516.412 * img[
-            ..., 1] / 256. - 276.836
-    else:
-        r = 298.082 * img[0] / 256. + 408.583 * img[2] / 256. - 222.921
-        g = 298.082 * img[0] / 256. - 100.291 * img[1] / 256. - 208.120 * img[
-            2] / 256. + 135.576
-        b = 298.082 * img[0] / 256. + 516.412 * img[1] / 256. - 276.836
-    return np.array([r, g, b]).transpose([1, 2, 0])
+    days = int(seconds / 3600 / 24)
+    seconds = seconds - days * 3600 * 24
+    hours = int(seconds / 3600)
+    seconds = seconds - hours * 3600
+    minutes = int(seconds / 60)
+    seconds = seconds - minutes * 60
+    seconds_final = int(seconds)
+    seconds = seconds - seconds_final
+    millis = int(seconds * 1000)
 
-
-def preprocess(img, device):
-    r"""Preprocess the input RGB image.
-
-    Args:
-        img (PIL.Image.open): RGB image.
-        device (torch.device): Run on CPU or GPU.
-
-    Returns:
-        Image format and y-axis image after preprocessing.
-
-    """
-    img = np.array(img).astype(np.float32)
-    ycbcr = convert_rgb_to_ycbcr(img)
-    x = ycbcr[..., 0]
-    x /= 255.
-    x = torch.from_numpy(x).to(device)
-    x = x.unsqueeze(0).unsqueeze(0)
-    return x, ycbcr
+    output = ""
+    time_index = 1
+    if days > 0:
+        output += str(days) + "D"
+        time_index += 1
+    if hours > 0 and time_index <= 2:
+        output += str(hours) + "h"
+        time_index += 1
+    if minutes > 0 and time_index <= 2:
+        output += str(minutes) + "m"
+        time_index += 1
+    if seconds_final > 0 and time_index <= 2:
+        output += str(seconds_final) + "s"
+        time_index += 1
+    if millis > 0 and time_index <= 2:
+        output += str(millis) + "ms"
+        time_index += 1
+    if output == "":
+        output = "0ms"
+    return output
