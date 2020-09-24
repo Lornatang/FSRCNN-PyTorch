@@ -50,119 +50,106 @@ bash download_dataset.sh
 Evaluate the overall performance of the network.
 ```bash
 usage: test.py [-h] [--dataroot DATAROOT] [--weights WEIGHTS] [--cuda]
-               [--scale-factor {2,3,4}] [--outf OUTF]
-               [--manualSeed MANUALSEED]
+               [--scale-factor {2,3,4}]
 
 Fast Super Resolution CNN.
 
 optional arguments:
   -h, --help            show this help message and exit
   --dataroot DATAROOT   The directory address where the image needs to be
-                        processed. (default: `./data/Set5/val`).
-  --weights WEIGHTS     Generator model name. (default:`weights/fsrcnn_X4.pth`)
+                        processed. (default: `./data/Set5`).
+  --weights WEIGHTS     Generator model name. (default:`weights/fsrcnn_4x.pth`)
   --cuda                Enables cuda
   --scale-factor {2,3,4}
                         Image scaling ratio. (default: `4`).
-  --outf OUTF           folder to output images. (default:`./results`).
-  --manualSeed MANUALSEED
-                        Seed for initializing training. (default:none)
 
 # Example
-python test.py --dataroot ./data/Set5/val --weights ./weights/srcnn_X4.pth --scale-factor 4 --cuda
+python test.py --dataroot ./data/Set5 --weights ./weights/fsrcnn_4x.pth --scale-factor 4 --cuda
 ```
 
 Evaluate the benchmark of validation data set in the network
 ```bash
-usage: test_benchmark.py [-h] [--data-file DATA_FILE] [-j N]
-                         [--scale-factor SCALE_FACTOR] [--cuda] [--outf OUTF]
-                         --weights WEIGHTS [--manualSeed MANUALSEED]
+usage: test_benchmark.py [-h] [--dataroot DATAROOT] [--image-size IMAGE_SIZE]
+                         [-j N] [--scale-factor {2,3,4}] [--cuda] --weights
+                         WEIGHTS
 
 Fast Super Resolution CNN.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --data-file DATA_FILE
-                        Path to data datasets.
-                        (default:`./data/test/Set5_X4.h5`)
+  --dataroot DATAROOT   Path to datasets. (default:`./data/DIV2K`)
+  --image-size IMAGE_SIZE
+                        Size of the data crop (squared assumed). (default:256)
   -j N, --workers N     Number of data loading workers. (default:0)
-  --scale-factor SCALE_FACTOR
+  --scale-factor {2,3,4}
                         Low to high resolution scaling factor. (default:4).
   --cuda                Enables cuda
-  --outf OUTF           folder to output images. (default:`./results`).
-  --weights WEIGHTS     Generator model name.
-                        (default:`weights/fsrcnn_X4.pth`)
-  --manualSeed MANUALSEED
-                        Seed for initializing training. (default:none)
+  --weights WEIGHTS     Path to weights.
+
 # Example
-python test_benchmark.py --data-file ./data/test/Set5_X4.h5 --weights ./weights/fsrcnn_X4.pth --scale-factor 4 --cuda
+python test_benchmark.py --dataroot ./data/DIV2K --weights ./weights/fsrcnn_4x.pth --scale-factor 4 --cuda
 ```
 
 Test single picture
 ```bash
 usage: test_image.py [-h] [--file FILE] [--weights WEIGHTS] [--cuda]
-                     [--scale-factor {2,3,4}] [--manualSeed MANUALSEED]
+                     [--scale-factor {2,3,4}]
 
 Fast Super Resolution CNN.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --file FILE           The file address where the image needs to be
-                        processed. (default: `./assets/baby.png`).
-  --weights WEIGHTS     Generator model name. (default:`weights/fsrcnn_X4.pth`)
+  --file FILE           Test low resolution image name.
+                        (default:`./assets/baby.png`)
+  --weights WEIGHTS     Generator model name. (default:`weights/fsrcnn_4x.pth`)
   --cuda                Enables cuda
   --scale-factor {2,3,4}
-                        Image scaling ratio. (default: `4`).
-  --manualSeed MANUALSEED
-                        Seed for initializing training. (default:none)
+                        Super resolution upscale factor. (default:4)
 
 # Example
-python test_image.py --file ./assets/baby.png --weights ./weights/fsrcnn_X4.pth --scale-factor 4 --cuda
+python test_image.py --file ./assets/baby.png --weights ./weights/fsrcnn_4x.pth --scale-factor 4 --cuda
 ```
 
 ### Train (e.g DIV2K)
 
 ```bash
-usage: train.py [-h] [--train-file TRAIN_FILE] [--eval-file EVAL_FILE] [-j N]
-                [--epochs N] [-b N] [--lr LR] [--scale-factor SCALE_FACTOR]
-                [-p N] [--cuda] [--outf OUTF] [--weights WEIGHTS]
+usage: train.py [-h] [--dataroot DATAROOT] [-j N] [--epochs N]
+                [--image-size IMAGE_SIZE] [-b N] [--lr LR]
+                [--scale-factor {2,3,4}] [-p N] [--cuda] [--weights WEIGHTS]
                 [--manualSeed MANUALSEED]
 
-PyTorch Super Resolution CNN.
+Fast Super Resolution CNN.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --train-file TRAIN_FILE
-                        Path to train datasets.
-                        (default:`./data/train/BSDS300_X4.h5`)
-  --eval-file EVAL_FILE
-                        Path to eval datasets.
-                        (default:`./data/val/Set5_X4.h5`)
+  --dataroot DATAROOT   Path to datasets. (default:`./data/DIV2K`)
   -j N, --workers N     Number of data loading workers. (default:0)
   --epochs N            Number of total epochs to run. (default:200)
-  -b N, --batch-size N  mini-batch size (default: 64), this is the total batch
+  --image-size IMAGE_SIZE
+                        Size of the data crop (squared assumed). (default:256)
+  -b N, --batch-size N  mini-batch size (default: 16), this is the total batch
                         size of all GPUs on the current node when using Data
                         Parallel or Distributed Data Parallel.
-  --lr LR               Learning rate. (default:0.001)
-  --scale-factor SCALE_FACTOR
+  --lr LR               Learning rate. (default:0.0001)
+  --scale-factor {2,3,4}
                         Low to high resolution scaling factor. (default:4).
   -p N, --print-freq N  Print frequency. (default:5)
   --cuda                Enables cuda
-  --outf OUTF           folder to output images. (default:`./outputs`).
   --weights WEIGHTS     Path to weights (to continue training).
   --manualSeed MANUALSEED
-                        Seed for initializing training. (default:none)
+                        Seed for initializing training. (default:0)
 ```
 
-#### Example (e.g T91)
+#### Example (e.g DIV2K)
 
 ```bash
-python train.py --train-file ./data/train/T91_X4.h5 --eval-file ./data/val/Set5_X4.h5 --scale-factor 4 --cuda
+python train.py --dataroot ./data/DIV2K --scale-factor 4 --cuda
 ```
 
 If you want to load weights that you've trained before, run the following command.
 
 ```bash
-python train.py --train-file ./data/train/T91_X4.h5 --eval-file ./data/val/Set5_X4.h5 --scale-factor 4 --weights ./weights/model_epoch_100.pth --cuda
+python train.py --dataroot ./data/DIV2K --scale-factor 4 --weights ./weights/fsrcnn_4x_epoch_100.pth --cuda
 ```
 
 ### Contributing
