@@ -122,7 +122,7 @@ optional arguments:
   --file FILE           Test low resolution video name.
   --weights WEIGHTS     Generator model name.
   --scale-factor {2,3,4}
-                        Super resolution upscale factor. (default:4)
+                        Super resolution upscale factor.
   --view                Super resolution real time to show.
   --cuda                Enables cuda
 
