@@ -11,37 +11,74 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-import h5py
-import numpy as np
-import torch.utils.data
+import os
+
+import torchvision.transforms as transforms
+from PIL import Image
+from torch.utils.data import Dataset
 
 
-class TrainDataset(torch.utils.data.Dataset):
-    def __init__(self, h5_file):
-        super(TrainDataset, self).__init__()
-        self.h5_file = h5_file
+def is_image_file(filename):
+    r"""Determine whether the files in the directory are in image format.
 
-    def __getitem__(self, idx):
-        with h5py.File(self.h5_file, "r") as f:
-            return np.expand_dims(f["lr"][idx] / 255., 0), np.expand_dims(
-                f["hr"][idx] / 255., 0)
+    Args:
+        filename (str): The current path of the image
+
+    Returns:
+        Returns True if it is an image and False if it is not.
+
+    """
+    return any(filename.endswith(extension) for extension in [".bmp", ".BMP",
+                                                              ".jpg", ".JPG",
+                                                              ".png", ".PNG",
+                                                              ".jpeg", ".JPEG"])
+
+
+class DatasetFromFolder(Dataset):
+    def __init__(self, images_dir, image_size=256, scale_factor=4):
+        r""" Dataset loading base class.
+
+        Args:
+            images_dir (str): The directory address where the image is stored.
+            image_size (int): Original high resolution image size. Default: 256.
+            scale_factor (int): Coefficient of image scale. Default: 4.
+        """
+        super(DatasetFromFolder, self).__init__()
+        self.image_filenames = [os.path.join(images_dir, x) for x in
+                                os.listdir(images_dir)
+                                if is_image_file(x)]
+
+        crop_size = image_size - (image_size % scale_factor)  # Valid crop size
+        self.input_transform = transforms.Compose(
+            [transforms.CenterCrop(crop_size),  # cropping the image
+             transforms.Resize(crop_size // scale_factor),
+             # subsampling the image (half size)
+             transforms.Resize(crop_size, interpolation=Image.BICUBIC),
+             # bicubic upsampling to get back the original size
+             transforms.ToTensor()])
+        self.target_transform = transforms.Compose(
+            [transforms.CenterCrop(crop_size),
+             # since it's the target, we keep its original quality
+             transforms.ToTensor()])
+
+    def __getitem__(self, index):
+        r""" Get image source file
+
+        Args:
+            index (int): Index position in image list.
+
+        Returns:
+            Low resolution image and high resolution image.
+
+        """
+        image = Image.open(self.image_filenames[index]).convert("YCbCr")
+        inputs, _, _ = image.split()
+        target = inputs.copy()
+
+        inputs = self.input_transform(inputs)
+        target = self.target_transform(target)
+
+        return inputs, target
 
     def __len__(self):
-        with h5py.File(self.h5_file, "r") as f:
-            return len(f["lr"])
-
-
-class ValDataset(torch.utils.data.Dataset):
-    def __init__(self, h5_file):
-        super(ValDataset, self).__init__()
-        self.h5_file = h5_file
-
-    def __getitem__(self, idx):
-        with h5py.File(self.h5_file, "r") as f:
-            return np.expand_dims(f["lr"][str(idx)][:, :] / 255.,
-                                  0), np.expand_dims(
-                f["hr"][str(idx)][:, :] / 255., 0)
-
-    def __len__(self):
-        with h5py.File(self.h5_file, "r") as f:
-            return len(f["lr"])
+        return len(self.image_filenames)
