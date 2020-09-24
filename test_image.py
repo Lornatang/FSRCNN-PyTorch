@@ -23,14 +23,13 @@ from fsrcnn_pytorch import FSRCNN
 
 parser = argparse.ArgumentParser(description="Fast Super Resolution CNN.")
 parser.add_argument("--file", type=str, default="./assets/baby.png",
-                    help="Test low resolution image name. "
-                         "(default:`./assets/baby.png`)")
+                    help="Test low resolution image name. (default:`./assets/baby.png`)")
 parser.add_argument("--weights", type=str, default="weights/fsrcnn_4x.pth",
                     help="Generator model name.  "
                          "(default:`weights/fsrcnn_4x.pth`)")
-parser.add_argument("--cuda", action="store_true", help="Enables cuda")
 parser.add_argument("--scale-factor", default=4, type=int, choices=[2, 3, 4],
                     help="Super resolution upscale factor. (default:4)")
+parser.add_argument("--cuda", action="store_true", help="Enables cuda")
 
 args = parser.parse_args()
 print(args)
@@ -38,8 +37,7 @@ print(args)
 cudnn.benchmark = True
 
 if torch.cuda.is_available() and not args.cuda:
-    print("WARNING: You have a CUDA device, "
-          "so you should probably run with --cuda")
+    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
 device = torch.device("cuda:0" if args.cuda else "cpu")
 
