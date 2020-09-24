@@ -111,8 +111,6 @@ scaler = amp.GradScaler()
 for epoch in range(args.epochs):
     model.train()
     train_loss = 0.
-    print("\n")
-    print(f"Start train epoch {epoch + 1}.")
     for iteration, (inputs, target) in enumerate(train_dataloader):
         optimizer.zero_grad()
 
@@ -139,17 +137,14 @@ for epoch in range(args.epochs):
 
         # Updates the scale for next iteration.
         scaler.update()
-        scheduler.step()
 
         train_loss += loss.item()
 
-        progress_bar(epoch, args.epochs, iteration, len(train_dataloader), f"Loss: {train_loss / (iteration + 1):.6f}")
+        progress_bar(epoch, args.epochs, iteration, len(train_dataloader), f"Loss: {loss.item():.6f}")
 
-    print(f"Epoch [{epoch + 1}/[{args.epochs}]. Training average loss: {train_loss / len(train_dataloader):.6f}")
+    print(f"Training average loss: {train_loss / len(train_dataloader):.6f}")
 
     # Test
-    print("\n")
-    print(f"Start eval epoch {epoch + 1}.")
     model.eval()
     avg_psnr = 0.
     with torch.no_grad():
@@ -161,6 +156,9 @@ for epoch in range(args.epochs):
             psnr = 10 * math.log10(1 / mse.item())
             avg_psnr += psnr
     print(f"Average PSNR: {avg_psnr / len(val_dataloader):.2f} dB.")
+
+    # Dynamic adjustment of learning rate.
+    scheduler.step()
 
     # Save model
     if (epoch + 1) % 20 == 0:
