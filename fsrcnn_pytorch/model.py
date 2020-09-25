@@ -19,34 +19,44 @@ class FSRCNN(nn.Module):
     def __init__(self, num_channels, scale_factor):
         super(FSRCNN, self).__init__()
 
-        self.main = nn.Sequential(
-            # Feature extraction
+        # Feature extraction
+        self.features = nn.Sequential(
             nn.Conv2d(in_channels=num_channels, out_channels=64, kernel_size=5, stride=1, padding=2),
-            nn.PReLU(),
-
-            # Channel shrinking
-            nn.Conv2d(in_channels=64, out_channels=12, kernel_size=1, stride=1, padding=0),
-            nn.PReLU(),
-
-            # Channel mapping
-            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
-            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
-            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
-            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
-            nn.PReLU(),
-
-            # Channel expanding
-            nn.Conv2d(in_channels=12, out_channels=64, kernel_size=1, stride=1, padding=0),
-            nn.PReLU(),
-
-            # Deconvolution
-            nn.ConvTranspose2d(in_channels=64, out_channels=num_channels, kernel_size=9,
-                               stride=scale_factor, padding=3, output_padding=1)
+            nn.PReLU()
         )
+
+        # Channel shrinking
+        self.shrink = nn.Sequential(
+            nn.Conv2d(in_channels=64, out_channels=12, kernel_size=1, stride=1, padding=0),
+            nn.PReLU()
+        )
+
+        # Channel mapping
+        self.map = nn.Sequential(
+            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=12, out_channels=12, kernel_size=3, stride=1, padding=1),
+            nn.PReLU()
+        )
+
+        # Channel expanding
+        self.expand = nn.Sequential(
+            nn.Conv2d(in_channels=12, out_channels=64, kernel_size=1, stride=1, padding=0),
+            nn.PReLU()
+        )
+
+        # Deconvolution
+        self.deconv = nn.ConvTranspose2d(in_channels=64, out_channels=num_channels, kernel_size=9,
+                                         stride=scale_factor, padding=4, output_padding=1)
 
     @amp.autocast()
     def forward(self, inputs):
-        out = self.main(inputs)
+        out = self.features(inputs)
+        out = self.shrink(out)
+        out = self.map(out)
+        out = self.expand(out)
+        out = self.deconv(out)
         return out
 
     def weight_init(self, mean=0.0, std=0.2):
