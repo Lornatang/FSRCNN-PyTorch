@@ -52,13 +52,9 @@ class DatasetFromFolder(Dataset):
         self.input_transform = transforms.Compose(
             [transforms.CenterCrop(crop_size),  # cropping the image
              transforms.Resize(crop_size // scale_factor),
-             # subsampling the image (half size)
-             transforms.Resize(crop_size, interpolation=Image.BICUBIC),
-             # bicubic upsampling to get back the original size
              transforms.ToTensor()])
         self.target_transform = transforms.Compose(
             [transforms.CenterCrop(crop_size),
-             # since it's the target, we keep its original quality
              transforms.ToTensor()])
 
     def __getitem__(self, index):
