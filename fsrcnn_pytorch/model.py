@@ -48,7 +48,7 @@ class FSRCNN(nn.Module):
 
         # Deconvolution
         self.deconv = nn.ConvTranspose2d(in_channels=64, out_channels=num_channels, kernel_size=9,
-                                         stride=scale_factor, padding=4, output_padding=1)
+                                         stride=scale_factor, padding=4, output_padding=scale_factor - 1)
 
     @amp.autocast()
     def forward(self, inputs):
