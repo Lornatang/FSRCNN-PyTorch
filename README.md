@@ -202,5 +202,4 @@ As a successful deep model applied in image super-resolution (SR), the Super-Res
     archivePrefix={arXiv},
     primaryClass={cs.CV}
 }
-}
 ```

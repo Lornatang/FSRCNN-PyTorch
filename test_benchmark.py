@@ -26,15 +26,15 @@ from fsrcnn_pytorch import progress_bar
 parser = argparse.ArgumentParser(description="Fast Super Resolution CNN.")
 parser.add_argument("--dataroot", type=str, default="./data/DIV2K",
                     help="Path to datasets. (default:`./data/DIV2K`)")
-parser.add_argument("--image-size", type=int, default=256,
-                    help="Size of the data crop (squared assumed). (default:256)")
 parser.add_argument("-j", "--workers", default=0, type=int, metavar="N",
                     help="Number of data loading workers. (default:0)")
+parser.add_argument("--image-size", type=int, default=64,
+                    help="Size of the data crop (squared assumed). (default:64)")
 parser.add_argument("--scale-factor", type=int, required=True, choices=[2, 3, 4],
                     help="Low to high resolution scaling factor.")
-parser.add_argument("--cuda", action="store_true", help="Enables cuda")
 parser.add_argument("--weights", type=str, required=True,
                     help="Path to weights.")
+parser.add_argument("--cuda", action="store_true", help="Enables cuda")
 
 args = parser.parse_args()
 print(args)

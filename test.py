@@ -35,12 +35,12 @@ parser = argparse.ArgumentParser(description="Fast Super Resolution CNN.")
 parser.add_argument("--dataroot", type=str, default="./data/Set5",
                     help="The directory address where the image needs "
                          "to be processed. (default: `./data/Set5`).")
+parser.add_argument("--scale-factor", type=int, default=4, choices=[2, 3, 4],
+                    help="Image scaling ratio. (default: `4`).")
 parser.add_argument("--weights", type=str, default="weights/fsrcnn_4x.pth",
                     help="Generator model name.  "
                          "(default:`weights/fsrcnn_4x.pth`)")
 parser.add_argument("--cuda", action="store_true", help="Enables cuda")
-parser.add_argument("--scale-factor", type=int, default=4, choices=[2, 3, 4],
-                    help="Image scaling ratio. (default: `4`).")
 
 args = parser.parse_args()
 print(args)
