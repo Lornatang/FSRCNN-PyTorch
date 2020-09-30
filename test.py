@@ -20,16 +20,16 @@ import torch.backends.cudnn as cudnn
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
 from PIL import Image
+from sewar.full_ref import mse
 from sewar.full_ref import msssim
+from sewar.full_ref import psnr
+from sewar.full_ref import rmse
 from sewar.full_ref import sam
+from sewar.full_ref import ssim
 from sewar.full_ref import vifp
 
 from fsrcnn_pytorch import FSRCNN
-from fsrcnn_pytorch import cal_mse
 from fsrcnn_pytorch import cal_niqe
-from fsrcnn_pytorch import cal_psnr
-from fsrcnn_pytorch import cal_rmse
-from fsrcnn_pytorch import cal_ssim
 
 parser = argparse.ArgumentParser(description="Fast Super Resolution CNN.")
 parser.add_argument("--dataroot", type=str, default="./data/Set5",
@@ -109,10 +109,10 @@ for filename in os.listdir(dataroot):
     src_img = cv2.imread(f"result/{filename}")
     dst_img = cv2.imread(f"{target}/{filename}")
 
-    total_mse_value += cal_mse(src_img, dst_img)
-    total_rmse_value += cal_rmse(src_img, dst_img)
-    total_psnr_value += cal_psnr(src_img, dst_img)
-    total_ssim_value += cal_ssim(src_img, dst_img)
+    total_mse_value += mse(src_img, dst_img)
+    total_rmse_value += rmse(src_img, dst_img)
+    total_psnr_value += psnr(src_img, dst_img)
+    total_ssim_value += ssim(src_img, dst_img)
     total_ms_ssim_value += msssim(src_img, dst_img)
     total_niqe_value += cal_niqe(f"result/{filename}")
     total_sam_value += sam(src_img, dst_img)
