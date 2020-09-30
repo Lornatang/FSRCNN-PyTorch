@@ -16,12 +16,12 @@ from torch.cuda import amp
 
 
 class FSRCNN(nn.Module):
-    def __init__(self, num_channels, scale_factor):
+    def __init__(self, scale_factor):
         super(FSRCNN, self).__init__()
 
         # Feature extraction
         self.features = nn.Sequential(
-            nn.Conv2d(in_channels=num_channels, out_channels=64, kernel_size=5, stride=1, padding=2),
+            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=5, stride=1, padding=2),
             nn.PReLU()
         )
 
@@ -47,8 +47,8 @@ class FSRCNN(nn.Module):
         )
 
         # Deconvolution
-        self.deconv = nn.ConvTranspose2d(in_channels=64, out_channels=num_channels, kernel_size=9,
-                                         stride=scale_factor, padding=4, output_padding=scale_factor - 1)
+        self.deconv = nn.ConvTranspose2d(in_channels=64, out_channels=3, kernel_size=9, stride=scale_factor, padding=4,
+                                         output_padding=scale_factor - 1)
 
     @amp.autocast()
     def forward(self, inputs):

@@ -13,7 +13,7 @@
 # ==============================================================================
 from .calculate_niqe import cal_niqe
 from .datasets import DatasetFromFolder
-from .datasets import is_image_file
+from .datasets import check_image_file
 from .model import FSRCNN
 from .utils import format_time
 from .utils import progress_bar
@@ -21,7 +21,7 @@ from .utils import progress_bar
 __all__ = [
     "cal_niqe",
     "DatasetFromFolder",
-    "is_image_file",
+    "check_image_file",
     "FSRCNN",
     "format_time",
     "progress_bar",

@@ -28,14 +28,12 @@ from fsrcnn_pytorch import FSRCNN
 from fsrcnn_pytorch import progress_bar
 
 parser = argparse.ArgumentParser(description="Fast Super Resolution CNN.")
-parser.add_argument("--dataroot", type=str, default="./data/DIV2K",
-                    help="Path to datasets. (default:`./data/DIV2K`)")
+parser.add_argument("--dataroot", type=str, default="./data",
+                    help="Path to datasets. (default:`./data`)")
 parser.add_argument("-j", "--workers", default=4, type=int, metavar="N",
                     help="Number of data loading workers. (default:4)")
 parser.add_argument("--epochs", default=200, type=int, metavar="N",
                     help="Number of total epochs to run. (default:200)")
-parser.add_argument("--image-size", type=int, default=64,
-                    help="Size of the data crop (squared assumed). (default:64)")
 parser.add_argument("-b", "--batch-size", default=16, type=int,
                     metavar="N",
                     help="mini-batch size (default: 16), this is the total "
@@ -72,12 +70,10 @@ cudnn.benchmark = True
 if torch.cuda.is_available() and not args.cuda:
     print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
-train_dataset = DatasetFromFolder(f"{args.dataroot}/train",
-                                  image_size=args.image_size,
-                                  scale_factor=args.scale_factor)
-val_dataset = DatasetFromFolder(f"{args.dataroot}/val",
-                                image_size=args.image_size,
-                                scale_factor=args.scale_factor)
+train_dataset = DatasetFromFolder(data_dir=f"{args.dataroot}/Digital-pathology/{args.scale_factor}x/train/data",
+                                  target_dir=f"{args.dataroot}/Digital-pathology/{args.scale_factor}x/train/target")
+val_dataset = DatasetFromFolder(data_dir=f"{args.dataroot}/Digital-pathology/{args.scale_factor}x/val/data",
+                                target_dir=f"{args.dataroot}/Digital-pathology/{args.scale_factor}x/val/target")
 
 train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                batch_size=args.batch_size,
@@ -92,7 +88,7 @@ val_dataloader = torch.utils.data.DataLoader(val_dataset,
 
 device = torch.device("cuda:0" if args.cuda else "cpu")
 
-model = FSRCNN(num_channels=1, scale_factor=args.scale_factor).to(device)
+model = FSRCNN(scale_factor=args.scale_factor).to(device)
 model.weight_init()
 
 if args.weights:

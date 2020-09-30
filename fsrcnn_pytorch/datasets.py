@@ -18,7 +18,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 
-def is_image_file(filename):
+def check_image_file(filename):
     r"""Determine whether the files in the directory are in image format.
 
     Args:
@@ -35,27 +35,18 @@ def is_image_file(filename):
 
 
 class DatasetFromFolder(Dataset):
-    def __init__(self, images_dir, image_size=256, scale_factor=4):
+    def __init__(self, data_dir, target_dir):
         r""" Dataset loading base class.
 
         Args:
-            images_dir (str): The directory address where the image is stored.
-            image_size (int): Original high resolution image size. Default: 256.
-            scale_factor (int): Coefficient of image scale. Default: 4.
+            data_dir (str): The directory address where the data image is stored.
+            target-dir (str): The directory address where the target image is stored.
         """
         super(DatasetFromFolder, self).__init__()
-        self.image_filenames = [os.path.join(images_dir, x) for x in
-                                os.listdir(images_dir)
-                                if is_image_file(x)]
+        self.data_filenames = [os.path.join(data_dir, x) for x in os.listdir(data_dir) if check_image_file(x)]
+        self.target_filenames = [os.path.join(target_dir, x) for x in os.listdir(target_dir) if check_image_file(x)]
 
-        crop_size = image_size - (image_size % scale_factor)  # Valid crop size
-        self.input_transform = transforms.Compose(
-            [transforms.CenterCrop(crop_size),  # cropping the image
-             transforms.Resize(crop_size // scale_factor),
-             transforms.ToTensor()])
-        self.target_transform = transforms.Compose(
-            [transforms.CenterCrop(crop_size),
-             transforms.ToTensor()])
+        self.transform = transforms.ToTensor()
 
     def __getitem__(self, index):
         r""" Get image source file
@@ -67,14 +58,13 @@ class DatasetFromFolder(Dataset):
             Low resolution image and high resolution image.
 
         """
-        image = Image.open(self.image_filenames[index]).convert("YCbCr")
-        inputs, _, _ = image.split()
-        target = inputs.copy()
+        inputs = Image.open(self.data_filenames[index])
+        target = Image.open(self.target_filenames[index])
 
-        inputs = self.input_transform(inputs)
-        target = self.target_transform(target)
+        inputs = self.transform(inputs)
+        target = self.transform(target)
 
         return inputs, target
 
     def __len__(self):
-        return len(self.image_filenames)
+        return len(self.data_filenames)
