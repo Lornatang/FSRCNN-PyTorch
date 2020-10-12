@@ -16,41 +16,37 @@ import os
 
 import cv2
 import numpy as np
-import torch.backends.cudnn as cudnn
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
 from PIL import Image
 from tqdm import tqdm
 
 from fsrcnn_pytorch import FSRCNN
+from fsrcnn_pytorch import select_device
 
-parser = argparse.ArgumentParser(description="Fast SRCNN algorithm is applied to video files.")
+parser = argparse.ArgumentParser(description="Accelerating the Super-Resolution Convolutional Neural Network.")
 parser.add_argument("--file", type=str, required=True,
                     help="Test low resolution video name.")
-parser.add_argument("--weights", type=str, required=True,
-                    help="Generator model name. ")
-parser.add_argument("--scale-factor", type=int, required=True, choices=[2, 3, 4],
-                    help="Super resolution upscale factor. (default:4)")
+parser.add_argument("--upscale-factor", type=int, default=4, choices=[2, 3, 4],
+                    help="Low to high resolution scaling factor. (default:4).")
+parser.add_argument("--weights", type=str, default="./weights/FSRCNN_4x.pth",
+                    help="Generator model name. (default:`./weights/FSRCNN_4x.pth`)")
+parser.add_argument("--device", default="0",
+                    help="device id i.e. `0` or `0,1` or `cpu`. (default: ``).")
 parser.add_argument("--view", action="store_true",
                     help="Super resolution real time to show.")
-parser.add_argument("--cuda", action="store_true",
-                    help="Enables cuda")
 
 args = parser.parse_args()
 print(args)
 
-cudnn.benchmark = True
+# Selection of appropriate treatment equipment
+device = select_device(args.device, batch_size=1)
 
-if torch.cuda.is_available() and not args.cuda:
-    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
-
-device = torch.device("cuda:0" if args.cuda else "cpu")
-
-# create model
-model = FSRCNN(num_channels=1, scale_factor=args.scale_factor).to(device)
+# Construct FSRCNN model.
+model = FSRCNN(upscale_factor=args.upscale_factor).to(device)
 
 # Load state dicts
-model.load_state_dict(torch.load(args.weights, map_location=device))
+model.load_state_dict(torch.load(args.weights, map_location=device)["state_dict"])
 
 # Set model eval mode
 model.eval()
@@ -68,12 +64,12 @@ fps = video_capture.get(cv2.CAP_PROP_FPS)
 total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 # Set video size
 size = (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-sr_size = (size[0] * args.scale_factor, size[1] * args.scale_factor)
+sr_size = (size[0] * args.upscale_factor, size[1] * args.upscale_factor)
 pare_size = (sr_size[0] * 2 + 10, sr_size[1] + 10 + sr_size[0] // 5 - 9)
 # Video write loader.
-srgan_writer = cv2.VideoWriter(f"fsrcnn_{args.scale_factor}x_{os.path.basename(video_name)}",
+srgan_writer = cv2.VideoWriter(f"fsrcnn_{os.path.basename(video_name)}",
                                cv2.VideoWriter_fourcc(*"MPEG"), fps, sr_size)
-compare_writer = cv2.VideoWriter(f"compare_{args.scale_factor}x_{os.path.basename(video_name)}",
+compare_writer = cv2.VideoWriter(f"compare_{os.path.basename(video_name)}",
                                  cv2.VideoWriter_fourcc(*"MPEG"), fps, pare_size)
 
 # read frame
@@ -87,10 +83,10 @@ for index in progress_bar:
         img = img.to(device)
 
         with torch.no_grad():
-            prediction = model(img)
+            sr = model(img)
 
-        prediction = prediction.cpu()
-        sr_frame_y = prediction[0].detach().numpy()
+        sr = sr.cpu()
+        sr_frame_y = sr[0].detach().numpy()
         sr_frame_y *= 255.0
         sr_frame_y = sr_frame_y.clip(0, 255)
         sr_frame_y = Image.fromarray(np.uint8(sr_frame_y[0]), mode="L")

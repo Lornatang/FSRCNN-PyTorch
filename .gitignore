@@ -134,3 +134,8 @@ outputs
 results
 weights/*.pth
 weights/*.zip
+
+*.png
+*.csv
+*.mp4
+logs

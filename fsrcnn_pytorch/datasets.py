@@ -13,58 +13,71 @@
 # ==============================================================================
 import os
 
+import torch.utils.data.dataset
 import torchvision.transforms as transforms
 from PIL import Image
-from torch.utils.data import Dataset
+
+from .utils import img2tensor
 
 
 def check_image_file(filename):
-    r"""Determine whether the files in the directory are in image format.
+    r"""Filter non image files in directory.
 
     Args:
-        filename (str): The current path of the image
+        filename (str): File name under path.
 
     Returns:
-        Returns True if it is an image and False if it is not.
+        Return True if bool(x) is True for any x in the iterable.
 
     """
-    return any(filename.endswith(extension) for extension in [".bmp", ".BMP",
-                                                              ".jpg", ".JPG",
+    return any(filename.endswith(extension) for extension in ["bmp", ".png",
+                                                              ".jpg", ".jpeg",
                                                               ".png", ".PNG",
                                                               ".jpeg", ".JPEG"])
 
 
-class DatasetFromFolder(Dataset):
-    def __init__(self, data_dir, target_dir):
-        r""" Dataset loading base class.
+class DatasetFromFolder(torch.utils.data.dataset.Dataset):
+    r"""An abstract class representing a :class:`Dataset`."""
+
+    def __init__(self, input_dir, target_dir):
+        r"""
 
         Args:
-            data_dir (str): The directory address where the data image is stored.
-            target-dir (str): The directory address where the target image is stored.
+            input_dir (str): The directory address where the data image is stored.
+            target_dir (str): The directory address where the target image is stored.
         """
         super(DatasetFromFolder, self).__init__()
-        self.data_filenames = [os.path.join(data_dir, x) for x in os.listdir(data_dir) if check_image_file(x)]
+        self.input_filenames = [os.path.join(input_dir, x) for x in os.listdir(input_dir) if check_image_file(x)]
         self.target_filenames = [os.path.join(target_dir, x) for x in os.listdir(target_dir) if check_image_file(x)]
-
-        self.transform = transforms.ToTensor()
+        self.input_transforms = transforms.Compose([
+            img2tensor(),
+            transforms.Normalize(mean=[0.5, ], std=[0.5, ])
+        ])
+        self.target_transforms = transforms.Compose([
+            img2tensor(),
+            transforms.Normalize(mean=[0.5, ], std=[0.5, ])
+        ])
 
     def __getitem__(self, index):
-        r""" Get image source file
+        r""" Get image source file.
 
         Args:
             index (int): Index position in image list.
 
         Returns:
-            Low resolution image and high resolution image.
-
+            Low resolution image, high resolution image.
         """
-        inputs = Image.open(self.data_filenames[index])
-        target = Image.open(self.target_filenames[index])
 
-        inputs = self.transform(inputs)
-        target = self.transform(target)
+        input = Image.open(self.input_filenames[index]).convert("YCbCr")
+        target = Image.open(self.target_filenames[index]).convert("YCbCr")
 
-        return inputs, target
+        input, _, _ = input.split()
+        target, _, _ = target.split()
+
+        input = self.input_transforms(input)
+        target = self.target_transforms(target)
+
+        return input, target
 
     def __len__(self):
-        return len(self.data_filenames)
+        return len(self.input_filenames)

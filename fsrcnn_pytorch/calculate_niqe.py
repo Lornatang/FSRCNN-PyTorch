@@ -150,11 +150,7 @@ def _niqe_extract_subband_feats(mscncoefs):
                      ])
 
 
-def get_patches_train_features(img, patch_size, stride=8):
-    return _get_patches_generic(img, patch_size)
-
-
-def get_patches_test_features(img, patch_size, stride=8):
+def get_patches_test_features(img, patch_size):
     return _get_patches_generic(img, patch_size)
 
 
