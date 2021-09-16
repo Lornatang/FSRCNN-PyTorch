@@ -60,7 +60,7 @@ if mode == "train":
                            {"params": model.shrink.parameters()},
                            {"params": model.map.parameters()},
                            {"params": model.expand.parameters()},
-                           {"params": model.deconv.parameters(), "lr": 0.00001}], 0.0001)
+                           {"params": model.deconv.parameters(), "lr": 0.0001}], 0.001)
 
     # Training log.
     writer = SummaryWriter(os.path.join("samples", "logs", exp_name))
