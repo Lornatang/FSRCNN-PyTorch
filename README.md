@@ -1,205 +1,146 @@
 # FSRCNN-PyTorch
 
-### Overview
-This repository contains an op-for-op PyTorch reimplementation of [Accelerating the Super-Resolution Convolutional Neural Network](https://arxiv.org/abs/1608.00367).
+## Overview
 
-### Table of contents
-1. [About Accelerating the Super-Resolution Convolutional Neural Network](#about-accelerating-the-super-resolution-convolutional-neural-network)
-2. [Installation](#installation)
-    * [Clone and install requirements](#clone-and-install-requirements)
-    * [Download pretrained weights](#download-pretrained-weights)
-    * [Download dataset](#download-dataset)
-3. [Test](#test)
-4. [Train](#train-eg-div2k)
-    * [Example](#example-eg-div2k)
-5. [Contributing](#contributing) 
-6. [Credit](#credit)
+This repository contains an op-for-op PyTorch reimplementation of [Accelerating the Super-Resolution Convolutional Neural Network](https://arxiv.org/abs/1608.00367v1).
 
-### About Accelerating the Super-Resolution Convolutional Neural Network
+## Table of contents
+
+- [FSRCNN-PyTorch](#fsrcnn-pytorch)
+    - [Overview](#overview)
+    - [Table of contents](#table-of-contents)
+    - [Accelerating the Super-Resolution Convolutional Neural Network](#accelerating-the-super-resolution-convolutional-neural-network)
+    - [Download weights](#download-weights)
+    - [Download datasets](#download-datasets)
+        - [Download train dataset](#download-train-dataset)
+        - [Download val dataset](#download-val-dataset)
+    - [Test](#test)
+    - [Train](#train)
+    - [Result](#result)
+    - [Credit](#credit)
+        - [Accelerating the Super-Resolution Convolutional Neural Network](#accelerating-the-super-resolution-convolutional-neural-network)
+
+## Accelerating the Super-Resolution Convolutional Neural Network
 
 If you're new to FSRCNN, here's an abstract straight from the paper:
 
-As a successful deep model applied in image super-resolution (SR), the Super-Resolution Convolutional Neural Network (SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration quality. However, the high computational cost still hinders it from practical usage that demands real-time performance (24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure for faster and better SR. We re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution layer at the end of the network, then the mapping is learned directly from the original low-resolution image (without interpolation) to the high-resolution one. Second, we reformulate the mapping layer by shrinking the input feature dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers. The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present the parameter settings that can achieve real-time performance on a generic CPU while still maintaining good performance. A corresponding transfer strategy is also proposed for fast training and testing across different upscaling factors.
+As a successful deep model applied in image super-resolution (SR), the Super-Resolution Convolutional Neural Network (
+SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration
+quality. However, the high computational cost still hinders it from practical usage that demands real-time performance (
+24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure
+for faster and better SR. We re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution
+layer at the end of the network, then the mapping is learned directly from the original low-resolution image (without
+interpolation) to the high-resolution one. Second, we reformulate the mapping layer by shrinking the input feature
+dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers.
+The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present
+the parameter settings that can achieve real-time performance on a generic CPU while still maintaining good performance.
+A corresponding transfer strategy is also proposed for fast training and testing across different upscaling factors.
 
-### Installation
+## Download weights
 
-#### Clone and install requirements
+- [Google Driver](https://drive.google.com/drive/folders/1-Cp0UVqSLBvW-gNV_Xvw5hlj1Ph7f6Oc?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1mXzvJeHQtSQxmhbBHQYcnA) access:`llot`
 
-```bash
-git clone https://github.com/Lornatang/FSRCNN-PyTorch.git
-cd FSRCNN-PyTorch/
-pip install -r requirements.txt
-```
+## Download datasets
 
-#### Download pretrained weights
+### Download train dataset
 
-```bash
-cd weights/
-bash download_weights.sh
-```
+- [Google Driver](https://drive.google.com/drive/folders/1iSmgWI7uU3vsHnlE1oOe59CCees0yncU?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/11X1WQSurtDJ9rNa8lF8NvQ) access: `llot`
 
-#### Download dataset
+### Download val dataset
 
-```bash
-cd data/
-bash download_dataset.sh
-```
+Set5 dataset:
 
-### Test
+- [Google Driver](https://drive.google.com/file/d/1GJZztdiJ6oBmJe9Ntyyos_psMzM8KY4P/view?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1_B97Ga6thSi5h43Wuqyw0Q) access:`llot`
 
-Evaluate the overall performance of the network.
-```bash
-usage: test.py [-h] [--dataroot DATAROOT] [--weights WEIGHTS] [--cuda]
-               [--scale-factor {2,3,4}]
+Set14 dataset:
 
-Fast Super Resolution CNN.
+- [Google Driver](https://drive.google.com/file/d/14bxrGB3Nej8vBqxLoqerGX2dhChQKJoa/view?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1wy_kf4Kkj2nSkgRUkaLzVA) access:`llot`
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --dataroot DATAROOT   The directory address where the image needs to be
-                        processed. (default: `./data/Set5`).
-  --weights WEIGHTS     Generator model name. (default:`weights/fsrcnn_4x.pth`)
-  --cuda                Enables cuda
-  --scale-factor {2,3,4}
-                        Image scaling ratio. (default: `4`).
+Bsd100 dataset:
 
-# Example
-python test.py --dataroot ./data/Set5 --weights ./weights/fsrcnn_4x.pth --scale-factor 4 --cuda
-```
+- [Google Driver](https://drive.google.com/file/d/1RTlPATPBCfUufJspgTik5KUEzAuVcyFF/view?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1Ig8t3_G4Nzhl8MvPAvdzFA) access:`llot`
 
-Evaluate the benchmark of validation data set in the network
-```bash
-usage: test_benchmark.py [-h] [--dataroot DATAROOT] [--image-size IMAGE_SIZE]
-                         [-j N] [--scale-factor {2,3,4}] [--cuda] --weights
-                         WEIGHTS
+## Test
 
-Fast Super Resolution CNN.
+Modify the contents of the file as follows.
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --dataroot DATAROOT   Path to datasets. (default:`./data/DIV2K`)
-  --image-size IMAGE_SIZE
-                        Size of the data crop (squared assumed). (default:256)
-  -j N, --workers N     Number of data loading workers. (default:0)
-  --scale-factor {2,3,4}
-                        Low to high resolution scaling factor. (default:4).
-  --cuda                Enables cuda
-  --weights WEIGHTS     Path to weights.
+- `config.py` line 32 `mode="train"` change to `mode="valid"`.
+- `config.py` line 83 `model.load_state_dict(torch.load(f"results/{exp_name}/best.pth", map_location=device))` change to `model.load_state_dict(torch.load("<YOUR-WEIGHTS-PATH>", map_location=device))`.
+- Run `python validate.py`.
 
-# Example
-python test_benchmark.py --dataroot ./data/DIV2K --weights ./weights/fsrcnn_4x.pth --scale-factor 4 --cuda
-```
+## Train
 
-Test single picture
-```bash
-usage: test_image.py [-h] [--file FILE] [--weights WEIGHTS] [--cuda]
-                     [--scale-factor {2,3,4}]
+Modify the contents of the file as follows.
 
-Fast Super Resolution CNN.
+- `config.py` line 32 `mode="valid"` change to `mode="train"`.
+- Run `python train.py`.
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --file FILE           Test low resolution image name.
-                        (default:`./assets/baby.png`)
-  --weights WEIGHTS     Generator model name. (default:`weights/fsrcnn_4x.pth`)
-  --cuda                Enables cuda
-  --scale-factor {2,3,4}
-                        Super resolution upscale factor.
+If you want to load weights that you've trained before, modify the contents of the file as follows.
 
-# Example
-python test_image.py --file ./assets/baby.png --weights ./weights/fsrcnn_4x.pth --scale-factor 4 --cuda
-```
+- `config.py` line 32 `mode="valid"` change to `mode="train"`.
+- `config.py` line 48 `start_epoch=0` change to `start_epoch=<RESUME-EPOCH>`.
+- `config.py` line 59 `resume=False` change to `resume=True`.
+- `config.py` line 50 `resume_weight=""` change to `resume_weight="<YOUR-RESUME-WIGHTS-PATH>"`.
+- Run `python train.py`.
 
-Test single video
-```bash
-usage: test_video.py [-h] --file FILE --weights WEIGHTS --scale-factor {2,3,4}
-                     [--view] [--cuda]
+## Result
 
-FSRCNN algorithm is applied to video files.
+Source of original paper results: https://arxiv.org/pdf/1608.00367v1.pdf
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --file FILE           Test low resolution video name.
-  --weights WEIGHTS     Generator model name.
-  --scale-factor {2,3,4}
-                        Super resolution upscale factor.
-  --view                Super resolution real time to show.
-  --cuda                Enables cuda
+In the following table, the value in `()` indicates the result of the project, and `-` indicates no test.
 
-# Example
-python test_video.py --file ./video/1.mp4 --weights ./weights/fsrcnn_4x.pth --scale-factor 4 --view --cuda
-```
+| Dataset | Scale |       PSNR       |        SSIM        |
+| :-----: | :---: | :--------------: | :----------------: |
+|  Set5   |   2   | 37.00(**36.76**) | 0.9558(**0.9564**) |
+|  Set5   |   3   | 33.16(**32.46**) | 0.9140(**0.9051**) |
+|  Set5   |   4   | 30.71(**30.37**) | 0.8657(**0.8589**) |
+|  Set14  |   2   | 32.63(**32.33**) | 0.9088(**0.9089**) |
+|  Set14  |   3   | 29.43(**28.85**) | 0.8242(**0.8181**) |
+|  Set14  |   4   | 27.59(**27.20**) | 0.7535(**0.7507**) |
 
 Low resolution / Recovered High Resolution / Ground Truth
+<span align="center"><img src="assets/result.png"/></span>
 
-<span align="center"><img src="assets/result.png" alt="">
-</span>
+## Credit
 
-### Train (e.g DIV2K)
+### Accelerating the Super-Resolution Convolutional Neural Network
 
-```bash
-usage: train.py [-h] [--dataroot DATAROOT] [-j N] [--epochs N]
-                [--image-size IMAGE_SIZE] [-b N] [--lr LR]
-                [--scale-factor {2,3,4}] [-p N] [--cuda] [--weights WEIGHTS]
-                [--manualSeed MANUALSEED]
-
-Fast Super Resolution CNN.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --dataroot DATAROOT   Path to datasets. (default:`./data/DIV2K`)
-  -j N, --workers N     Number of data loading workers. (default:0)
-  --epochs N            Number of total epochs to run. (default:200)
-  --image-size IMAGE_SIZE
-                        Size of the data crop (squared assumed). (default:256)
-  -b N, --batch-size N  mini-batch size (default: 16), this is the total batch
-                        size of all GPUs on the current node when using Data
-                        Parallel or Distributed Data Parallel.
-  --lr LR               Learning rate. (default:0.0001)
-  --scale-factor {2,3,4}
-                        Low to high resolution scaling factor. (default:4).
-  -p N, --print-freq N  Print frequency. (default:5)
-  --cuda                Enables cuda
-  --weights WEIGHTS     Path to weights (to continue training).
-  --manualSeed MANUALSEED
-                        Seed for initializing training. (default:0)
-```
-
-#### Example (e.g DIV2K)
-
-```bash
-python train.py --dataroot ./data/DIV2K --scale-factor 4 --cuda
-```
-
-If you want to load weights that you've trained before, run the following command.
-
-```bash
-python train.py --dataroot ./data/DIV2K --scale-factor 4 --weights ./weights/fsrcnn_4x_epoch_100.pth --cuda
-```
-
-### Contributing
-
-If you find a bug, create a GitHub issue, or even better, submit a pull request. Similarly, if you have questions, simply post them as GitHub issues.   
-
-I look forward to seeing what the community does with these models! 
-
-### Credit
-
-#### Accelerating the Super-Resolution Convolutional Neural Network
 _Chao Dong, Chen Change Loy, Xiaoou Tang_ <br>
 
 **Abstract** <br>
-As a successful deep model applied in image super-resolution (SR), the Super-Resolution Convolutional Neural Network (SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration quality. However, the high computational cost still hinders it from practical usage that demands real-time performance (24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure for faster and better SR. We re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution layer at the end of the network, then the mapping is learned directly from the original low-resolution image (without interpolation) to the high-resolution one. Second, we reformulate the mapping layer by shrinking the input feature dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers. The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present the parameter settings that can achieve real-time performance on a generic CPU while still maintaining good performance. A corresponding transfer strategy is also proposed for fast training and testing across different upscaling factors.
+As a successful deep model applied in image super-resolution (SR), the Super-Resolution Convolutional Neural Network (
+SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration
+quality. However, the high computational cost still hinders it from practical usage that demands real-time performance (
+24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure
+for faster and better SR. We re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution
+layer at the end of the network, then the mapping is learned directly from the original low-resolution image (without
+interpolation) to the high-resolution one. Second, we reformulate the mapping layer by shrinking the input feature
+dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers.
+The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present
+the parameter settings that can achieve real-time performance on a generic CPU while still maintaining good performance.
+A corresponding transfer strategy is also proposed for fast training and testing across different upscaling factors.
 
-[[Paper]](https://arxiv.org/pdf/1608.00367)
+[[Paper]](https://arxiv.org/pdf/1608.00367v1.pdf)
 
-```
-@misc{dong2016accelerating,
-    title={Accelerating the Super-Resolution Convolutional Neural Network},
-    author={Chao Dong and Chen Change Loy and Xiaoou Tang},
-    year={2016},
-    eprint={1608.00367},
-    archivePrefix={arXiv},
-    primaryClass={cs.CV}
+```bibtex
+@article{DBLP:journals/corr/DongLT16,
+  author    = {Chao Dong and
+               Chen Change Loy and
+               Xiaoou Tang},
+  title     = {Accelerating the Super-Resolution Convolutional Neural Network},
+  journal   = {CoRR},
+  volume    = {abs/1608.00367},
+  year      = {2016},
+  url       = {http://arxiv.org/abs/1608.00367},
+  eprinttype = {arXiv},
+  eprint    = {1608.00367},
+  timestamp = {Mon, 13 Aug 2018 16:47:56 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/DongLT16.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 ```
