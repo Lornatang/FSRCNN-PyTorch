@@ -9,7 +9,7 @@ This repository contains an op-for-op PyTorch reimplementation of [Accelerating 
 - [FSRCNN-PyTorch](#fsrcnn-pytorch)
     - [Overview](#overview)
     - [Table of contents](#table-of-contents)
-    - [Accelerating the Super-Resolution Convolutional Neural Network](#accelerating-the-super-resolution-convolutional-neural-network)
+    - [About Accelerating the Super-Resolution Convolutional Neural Network](#about-accelerating-the-super-resolution-convolutional-neural-network)
     - [Download weights](#download-weights)
     - [Download datasets](#download-datasets)
         - [Download train dataset](#download-train-dataset)
@@ -20,7 +20,7 @@ This repository contains an op-for-op PyTorch reimplementation of [Accelerating 
     - [Credit](#credit)
         - [Accelerating the Super-Resolution Convolutional Neural Network](#accelerating-the-super-resolution-convolutional-neural-network)
 
-## Accelerating the Super-Resolution Convolutional Neural Network
+## About Accelerating the Super-Resolution Convolutional Neural Network
 
 If you're new to FSRCNN, here's an abstract straight from the paper:
 
