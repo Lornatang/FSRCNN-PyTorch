@@ -13,51 +13,65 @@
 # ==============================================================================
 """Realize the function of dataset preparation."""
 import os
-from typing import Tuple
 
 from PIL import Image
 from torch import Tensor
 from torch.utils.data import Dataset
+from torchvision import transforms
+from torchvision.transforms.functional import InterpolationMode as IMode
 
-from imgproc import image2tensor
-from imgproc import random_rotate
+import imgproc
 
-__all__ = ["BaseDataset"]
+__all__ = ["ImageDataset"]
 
 
-class BaseDataset(Dataset):
+class ImageDataset(Dataset):
     """Customize the data set loading function and prepare low/high resolution image data in advance.
 
     Args:
-        dataroot (str): training data set address.
+        dataroot         (str): Training data set address.
+        image_size       (int): High resolution image size.
+        upscale_factor   (int): Magnification.
+        mode             (str): Data set loading method, the training data set is for data enhancement,
+                                and the verification data set is not for data enhancement.
     """
 
-    def __init__(self, dataroot: str) -> None:
-        super(BaseDataset, self).__init__()
+    def __init__(self, dataroot: str, image_size: int, upscale_factor: int, mode: str) -> None:
+        super(ImageDataset, self).__init__()
         # Get the index of all images in the high-resolution folder and low-resolution folder under the data set address.
         # Note: The high and low resolution file index should be corresponding.
-        lr_dir_path = os.path.join(dataroot, "inputs")
-        hr_dir_path = os.path.join(dataroot, "target")
-        self.filenames = os.listdir(lr_dir_path)
-        self.lr_filenames = [os.path.join(lr_dir_path, x) for x in self.filenames]
-        self.hr_filenames = [os.path.join(hr_dir_path, x) for x in self.filenames]
+        lr_image_size = (image_size // upscale_factor, image_size // upscale_factor)
+        hr_image_size = (image_size, image_size)
+        self.filenames = [os.path.join(dataroot, x) for x in os.listdir(dataroot)]
+        # Low-resolution images and high-resolution images have different processing methods.
+        if mode == "train":
+            self.hr_transforms = transforms.RandomResizedCrop(hr_image_size)
+        else:
+            self.hr_transforms = transforms.CenterCrop(hr_image_size)
+        self.lr_transforms = transforms.Resize(lr_image_size, interpolation=IMode.BICUBIC)
 
-    def __getitem__(self, index: int) -> Tuple[Tensor, Tensor]:
-        lr = Image.open(self.lr_filenames[index]).convert("YCbCr")
-        hr = Image.open(self.hr_filenames[index]).convert("YCbCr")
+    def __getitem__(self, batch_index: int) -> [Tensor, Tensor]:
+        # Read a batch of image data
+        hr_image_data = Image.open(self.filenames[batch_index])
 
-        # DA operation.
-        lr, hr = random_rotate(lr, hr, 90)
+        # Transform image
+        hr_image_data = self.hr_transforms(hr_image_data)
+        lr_image_data = self.lr_transforms(hr_image_data)
 
-        # Only extract the image data of the Y channel.
-        lr, _, _ = lr.split()
-        hr, _, _ = hr.split()
+        # RGB convert YCbCr
+        lr_ycbcr_image_data = lr_image_data.convert("YCbCr")
+        hr_ycbcr_image_data = hr_image_data.convert("YCbCr")
 
-        # `PIL.Image` image data is converted to `Tensor` format data.
-        lr = image2tensor(lr)
-        hr = image2tensor(hr)
+        # Only extract the image data of the Y channel
+        lr_y_image_data = lr_ycbcr_image_data.split()[0]
+        hr_y_image_data = hr_ycbcr_image_data.split()[0]
 
-        return lr, hr
+        # Convert image data into Tensor stream format (PyTorch).
+        # Note: The range of input and output is between [0, 1]
+        lr_tensor_data = imgproc.image2tensor(lr_y_image_data, range_norm=False, half=False)
+        hr_tensor_data = imgproc.image2tensor(hr_y_image_data, range_norm=False, half=False)
+
+        return lr_tensor_data, hr_tensor_data
 
     def __len__(self) -> int:
         return len(self.filenames)
