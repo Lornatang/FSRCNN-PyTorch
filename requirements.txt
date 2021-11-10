@@ -8,3 +8,4 @@ scikit-image
 numpy
 matplotlib
 setuptools
+natsort
