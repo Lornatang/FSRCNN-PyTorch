@@ -12,75 +12,57 @@
 # limitations under the License.
 # ==============================================================================
 """Realize the parameter configuration function of dataset, model, training and verification code."""
-import os
-
 import torch
-import torch.backends.cudnn as cudnn
-from torch import nn
-from torch import optim
-from torch.utils.tensorboard import SummaryWriter
-
-from model import FSRCNN
+from torch.backends import cudnn as cudnn
 
 # ==============================================================================
 # General configuration
 # ==============================================================================
 torch.manual_seed(0)
-upscale_factor = 2
-device = torch.device("cuda:0")
+device = torch.device("cuda", 0)
 cudnn.benchmark = True
+upscale_factor = 2
 mode = "train"
-exp_name = "exp000"
+exp_name = "exp001"
 
 # ==============================================================================
 # Training configuration
 # ==============================================================================
 if mode == "train":
-    # Dataset.
-    train_dir = f"data/T91_General100/X{upscale_factor}/train"
-    valid_dir = f"data/T91_General100/X{upscale_factor}/valid"
+    # Dataset
+    # Image format
+    train_image_dir = f"data/T91/train/HR"
+    valid_image_dir = f"data/T91/valid/LRbicx{upscale_factor}"
+
     batch_size = 16
 
-    # Model.
-    model = FSRCNN(upscale_factor).to(device)
-
-    # Resuming training.
-    start_epoch = 0
+    # Incremental training and migration training
     resume = False
+    strict = True
+    start_epoch = 0
     resume_weight = ""
 
-    # Total number of epochs.
-    epochs = 307
+    # Total number of epochs
+    epochs = 100
 
-    # Loss function.
-    criterion = nn.MSELoss().to(device)
+    # Model optimizer parameter (less training and low PSNR)
+    model_optimizer_name = "sgd"
+    model_lr = 1e-3
+    model_momentum = 0.9
+    model_weight_decay = 1e-6
+    model_nesterov = False
 
-    # Optimizer.
-    optimizer = optim.SGD([{"params": model.feature_extraction.parameters()},
-                           {"params": model.shrink.parameters()},
-                           {"params": model.map.parameters()},
-                           {"params": model.expand.parameters()},
-                           {"params": model.deconv.parameters(), "lr": 0.0001}], 0.001)
-
-    # Training log.
-    writer = SummaryWriter(os.path.join("samples", "logs", exp_name))
-
-    # Additional variables.
-    exp_dir1 = os.path.join("samples", exp_name)
-    exp_dir2 = os.path.join("results", exp_name)
+    # Modify optimizer parameter (faster training and better PSNR)
+    # model_optimizer_name = "adam"
+    # model_lr = 1e-3
+    # model_betas = (0.9, 0.999)
 
 # ==============================================================================
 # Verify configuration
 # ==============================================================================
 if mode == "valid":
-    # Test data address.
-    lr_dir = f"data/Set5/LRbicx2"
+    # Test data address
     sr_dir = f"results/test/{exp_name}"
     hr_dir = f"data/Set5/GTmod12"
 
-    # Load sr model.
-    model = FSRCNN(upscale_factor).to(device)
-    model.load_state_dict(torch.load(f"results/{exp_name}/best.pth", map_location=device))
-
-    # Additional variables.
-    exp_dir = os.path.join("results", "test", exp_name)
+    model_path = f"results/{exp_name}/srcnn_best.pth"
