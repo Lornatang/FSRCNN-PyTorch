@@ -31,11 +31,10 @@ exp_name = "exp001"
 if mode == "train":
     # Dataset
     # Image format
-    train_lr_image_dir = f"data/T91_General100/train/LRbicx{upscale_factor}"
-    valid_lr_image_dir = f"data/T91_General100/valid/LRbicx{upscale_factor}"
-    train_hr_image_dir = f"data/T91_General100/train/HR"
-    valid_hr_image_dir = f"data/T91_General100/valid/HR"
+    train_image_dir = f"data/T91_General100/train"
+    valid_image_dir = f"data/T91_General100/valid"
 
+    image_size = 72
     batch_size = 16
 
     # Incremental training and migration training
