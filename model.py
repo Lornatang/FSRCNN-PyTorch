@@ -58,8 +58,7 @@ class FSRCNN(nn.Module):
         )
 
         # Deconvolution layer.
-        self.deconv = nn.ConvTranspose2d(56, 1, (9, 9), (upscale_factor, upscale_factor), (4, 4),
-                                         (upscale_factor - 1, upscale_factor - 1))
+        self.deconv = nn.ConvTranspose2d(56, 1, (9, 9), (upscale_factor, upscale_factor), (4, 4), (upscale_factor - 1, upscale_factor - 1))
 
         # Initialize model weights.
         self._initialize_weights()
@@ -81,9 +80,7 @@ class FSRCNN(nn.Module):
     def _initialize_weights(self) -> None:
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                mean = 0.0
-                std = sqrt(2 / (m.out_channels * m.weight.data[0][0].numel()))
-                nn.init.normal_(m.weight.data, mean=mean, std=std)
+                nn.init.normal_(m.weight.data, mean=0.0, std=sqrt(2 / (m.out_channels * m.weight.data[0][0].numel())))
                 nn.init.zeros_(m.bias.data)
 
         nn.init.normal_(self.deconv.weight.data, mean=0.0, std=0.001)
