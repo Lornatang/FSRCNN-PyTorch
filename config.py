@@ -66,4 +66,4 @@ if mode == "valid":
     sr_dir = f"results/test/{exp_name}"
     hr_dir = f"data/Set5/GTmod12"
 
-    model_path = f"results/{exp_name}/srcnn_best.pth"
+    model_path = f"results/{exp_name}/best.pth"
