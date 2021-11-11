@@ -182,7 +182,7 @@ def main() -> None:
         # Automatically save the model with the highest index
         is_best = psnr > best_psnr
         best_psnr = max(psnr, best_psnr)
-        torch.save(model.state_dict(), os.path.join(samples_dir, f"epoch{epoch + 1}.pth"))
+        torch.save(model.state_dict(), os.path.join(samples_dir, f"epoch_{epoch + 1}.pth"))
         if is_best:
             torch.save(model.state_dict(), os.path.join(results_dir, "best.pth"))
 
