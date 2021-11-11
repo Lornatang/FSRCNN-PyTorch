@@ -13,7 +13,7 @@ This repository contains an op-for-op PyTorch reimplementation of [Accelerating 
     - [Download weights](#download-weights)
     - [Download datasets](#download-datasets)
         - [Download train dataset](#download-train-dataset)
-        - [Download val dataset](#download-val-dataset)
+        - [Download valid dataset](#download-valid-dataset)
     - [Test](#test)
     - [Train](#train)
     - [Result](#result)
@@ -45,65 +45,64 @@ A corresponding transfer strategy is also proposed for fast training and testing
 
 ### Download train dataset
 
-- [Google Driver](https://drive.google.com/drive/folders/1iSmgWI7uU3vsHnlE1oOe59CCees0yncU?usp=sharing)
-- [Baidu Driver](https://pan.baidu.com/s/11X1WQSurtDJ9rNa8lF8NvQ) access: `llot`
+#### T91_General100
 
-### Download val dataset
+- Image format
+    - [Google Driver](https://drive.google.com/drive/folders/1iSmgWI7uU3vsHnlE1oOe59CCees0yncU?usp=sharing)
+    - [Baidu Driver](https://pan.baidu.com/s/11X1WQSurtDJ9rNa8lF8NvQ) access: `llot`
 
-Set5 dataset:
+### Download valid dataset
 
-- [Google Driver](https://drive.google.com/file/d/1GJZztdiJ6oBmJe9Ntyyos_psMzM8KY4P/view?usp=sharing)
-- [Baidu Driver](https://pan.baidu.com/s/1_B97Ga6thSi5h43Wuqyw0Q) access:`llot`
+#### Set5
 
-Set14 dataset:
+- Image format
+    - [Google Driver](https://drive.google.com/file/d/1GJZztdiJ6oBmJe9Ntyyos_psMzM8KY4P/view?usp=sharing)
+    - [Baidu Driver](https://pan.baidu.com/s/1_B97Ga6thSi5h43Wuqyw0Q) access:`llot`
 
-- [Google Driver](https://drive.google.com/file/d/14bxrGB3Nej8vBqxLoqerGX2dhChQKJoa/view?usp=sharing)
-- [Baidu Driver](https://pan.baidu.com/s/1wy_kf4Kkj2nSkgRUkaLzVA) access:`llot`
+#### Set14
 
-Bsd100 dataset:
+- Image format
+    - [Google Driver](https://drive.google.com/file/d/14bxrGB3Nej8vBqxLoqerGX2dhChQKJoa/view?usp=sharing)
+    - [Baidu Driver](https://pan.baidu.com/s/1wy_kf4Kkj2nSkgRUkaLzVA) access:`llot`
 
-- [Google Driver](https://drive.google.com/file/d/1RTlPATPBCfUufJspgTik5KUEzAuVcyFF/view?usp=sharing)
-- [Baidu Driver](https://pan.baidu.com/s/1Ig8t3_G4Nzhl8MvPAvdzFA) access:`llot`
+#### BSD100
+
+- Image format
+    - [Google Driver](https://drive.google.com/file/d/1xkjWJGZgwWjDZZFN6KWlNMvHXmRORvdG/view?usp=sharing)
+    - [Baidu Driver](https://pan.baidu.com/s/1EBVulUpsQrDmZfqnm4jOZw) access:`llot`
 
 ## Test
 
 Modify the contents of the file as follows.
-
-- `config.py` line 32 `mode="train"` change to `mode="valid"`.
-- `config.py` line 83 `model.load_state_dict(torch.load(f"results/{exp_name}/best.pth", map_location=device))` change to `model.load_state_dict(torch.load("<YOUR-WEIGHTS-PATH>", map_location=device))`.
-- Run `python validate.py`.
+- line 24: `upscale_factor` change to the magnification you need to enlarge. 
+- line 25: `mode` change Set to valid mode.
+- line 69: `model_path` change weight address after training.
 
 ## Train
 
 Modify the contents of the file as follows.
-
-- `config.py` line 32 `mode="valid"` change to `mode="train"`.
-- Run `python train.py`.
+- line 24: `upscale_factor` change to the magnification you need to enlarge. 
+- line 25: `mode` change Set to train mode.
 
 If you want to load weights that you've trained before, modify the contents of the file as follows.
-
-- `config.py` line 32 `mode="valid"` change to `mode="train"`.
-- `config.py` line 48 `start_epoch=0` change to `start_epoch=<RESUME-EPOCH>`.
-- `config.py` line 59 `resume=False` change to `resume=True`.
-- `config.py` line 50 `resume_weight=""` change to `resume_weight="<YOUR-RESUME-WIGHTS-PATH>"`.
-- Run `python train.py`.
+- line 41: `resume` change to `True`. 
+- line 42: `strict` Transfer learning is set to `False`, incremental learning is set to `True`.
+- line 43: `start_epoch` change number of training iterations in the previous round.
+- line 44: `resume_weight` the weight address that needs to be loaded.
 
 ## Result
 
-Source of original paper results: https://arxiv.org/pdf/1608.00367v1.pdf
+Source of original paper results: https://arxiv.org/pdf/1501.00092v3.pdf
 
 In the following table, the value in `()` indicates the result of the project, and `-` indicates no test.
 
-| Dataset | Scale |       PSNR       |        SSIM        |
-| :-----: | :---: | :--------------: | :----------------: |
-|  Set5   |   2   | 37.00(**36.76**) | 0.9558(**0.9564**) |
-|  Set5   |   3   | 33.16(**32.46**) | 0.9140(**0.9051**) |
-|  Set5   |   4   | 30.71(**30.37**) | 0.8657(**0.8589**) |
-|  Set14  |   2   | 32.63(**32.33**) | 0.9088(**0.9089**) |
-|  Set14  |   3   | 29.43(**28.85**) | 0.8242(**0.8181**) |
-|  Set14  |   4   | 27.59(**27.20**) | 0.7535(**0.7507**) |
+| Dataset | Scale |       PSNR       |
+| :-----: | :---: | :--------------: |
+|  Set5   |   2   | 36.94(**36.94**) |
+|  Set5   |   3   | 33.06(**32.88**) |
+|  Set5   |   4   | 30.55(**30.58**) |
 
-Low resolution / Recovered High Resolution / Ground Truth
+Low Resolution / Super Resolution / High Resolution
 <span align="center"><img src="assets/result.png"/></span>
 
 ## Credit
