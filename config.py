@@ -44,25 +44,26 @@ if mode == "train":
     resume_weight = ""
 
     # Total number of epochs
-    epochs = 100
+    epochs = 600
 
     # Model optimizer parameter (less training and low PSNR)
-    model_optimizer_name = "sgd"
-    model_lr = 1e-3
-    model_momentum = 0.9
-    model_weight_decay = 1e-6
-    model_nesterov = False
+    # model_optimizer_name = "sgd"
+    # model_lr = 1e-3
+    # model_momentum = 0.9
+    # model_weight_decay = 1e-7
+    # model_nesterov = False
 
     # Modify optimizer parameter (faster training and better PSNR)
-    # model_optimizer_name = "adam"
-    # model_lr = 1e-3
-    # model_betas = (0.9, 0.999)
+    model_optimizer_name = "adam"
+    model_lr = 1e-3
+    model_betas = (0.9, 0.999)
 
 # ==============================================================================
 # Verify configuration
 # ==============================================================================
 if mode == "valid":
     # Test data address
+    lr_dir = f"data/Set5/LRbicx{upscale_factor}"
     sr_dir = f"results/test/{exp_name}"
     hr_dir = f"data/Set5/GTmod12"
 
