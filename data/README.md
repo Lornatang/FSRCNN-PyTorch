@@ -41,16 +41,10 @@
 
 ```text
 - TG191
-    - x2
-        - train
-            - ...
-        - valid
-            - ...
-    - x3
-        - train
-            - ...
-        - valid
-            - ...
+    - train
+        - ...
+    - valid
+        - ...
 ```
 
 ### LMDB format
