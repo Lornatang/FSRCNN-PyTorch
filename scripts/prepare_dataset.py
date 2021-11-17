@@ -16,58 +16,51 @@ import os
 import shutil
 
 from PIL import Image
+from tqdm import tqdm
 
 
 def main(args):
-    raw_image_dir = f"{args.image_dir}/GTmod12"
-    hr_image_dir = f"{args.image_dir}/train/HR"
-    lrbicx2_image_dir = f"{args.image_dir}/train/LRbicx2"
-    lrbicx3_image_dir = f"{args.image_dir}/train/LRbicx3"
-    lrbicx4_image_dir = f"{args.image_dir}/train/LRbicx4"
+    raw_image_dir = f"{args.output_dir}/GTmod12"
+    new_image_dir = f"{args.output_dir}/train"
 
-    # Create dataset folder
-    if os.path.exists(hr_image_dir):
-        shutil.rmtree(hr_image_dir)
-    if os.path.exists(lrbicx2_image_dir):
-        shutil.rmtree(lrbicx2_image_dir)
-    if os.path.exists(lrbicx3_image_dir):
-        shutil.rmtree(lrbicx3_image_dir)
-    if os.path.exists(lrbicx4_image_dir):
-        shutil.rmtree(lrbicx4_image_dir)
-
-    os.makedirs(hr_image_dir)
-    os.makedirs(lrbicx2_image_dir)
-    os.makedirs(lrbicx3_image_dir)
-    os.makedirs(lrbicx4_image_dir)
+    if os.path.exists(raw_image_dir):
+        shutil.rmtree(raw_image_dir)
+    if os.path.exists(new_image_dir):
+        shutil.rmtree(new_image_dir)
+    os.makedirs(raw_image_dir)
+    os.makedirs(new_image_dir)
 
     # Carry out data enhancement processing on the data set in the GTmod12 catalog in turn
-    for file_name in os.listdir(raw_image_dir):
-        base_file_name = os.path.basename(file_name)
-        raw_image = Image.open(f"{raw_image_dir}/{base_file_name}")
+    for file_name in os.listdir(args.inputs_dir):
+        raw_image = Image.open(f"{args.inputs_dir}/{file_name}")
 
+        index = 0
         for scale_ratio in [1.0, 0.9, 0.8, 0.7, 0.6]:
             for rotate_angle in [0, 90, 180, 270]:
                 # Process HR image
                 new_image = raw_image.resize((int(raw_image.width * scale_ratio), int(raw_image.height * scale_ratio)), Image.BICUBIC)
                 new_image = new_image.rotate(rotate_angle, expand=True)
-                new_image.save(f"{hr_image_dir}/{base_file_name.split('.')[-2]}_s{scale_ratio}_r{rotate_angle}.png")
+                new_image.save(f"{raw_image_dir}/{file_name.split('.')[-2]}_{index:04d}.{file_name.split('.')[-1]}")
+                index += 1
 
-                # Process LRbicx2 image
-                lrbicx2_image = new_image.resize([new_image.width // 2, new_image.height // 2], Image.BICUBIC)
-                lrbicx2_image.save(f"{lrbicx2_image_dir}/{base_file_name.split('.')[-2]}_s{scale_ratio}_r{rotate_angle}.png")
+    file_names = os.listdir(raw_image_dir)
+    for file_name in tqdm(file_names, total=len(file_names)):
+        # Use PIL to read high-resolution image
+        image = Image.open(f"{raw_image_dir}/{file_name}")
 
-                # Process LRbicx3 image
-                lrbicx3_image = new_image.resize([new_image.width // 3, new_image.height // 3], Image.BICUBIC)
-                lrbicx3_image.save(f"{lrbicx3_image_dir}/{base_file_name.split('.')[-2]}_s{scale_ratio}_r{rotate_angle}.png")
-
-                # Process LRbicx4 image
-                lrbicx4_image = new_image.resize([new_image.width // 4, new_image.height // 4], Image.BICUBIC)
-                lrbicx4_image.save(f"{lrbicx4_image_dir}/{base_file_name.split('.')[-2]}_s{scale_ratio}_r{rotate_angle}.png")
+        for pos_x in range(0, image.size[0] - args.image_size + 1, args.step):
+            for pos_y in range(0, image.size[1] - args.image_size + 1, args.step):
+                crop_image = image.crop([pos_x, pos_y, pos_x + args.image_size, pos_y + args.image_size])
+                # Save all images
+                crop_image.save(f"{new_image_dir}/{file_name.split('.')[-2]}_{pos_x}_{pos_y}.{file_name.split('.')[-1]}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare database scripts (Use FSRCNN functions).")
-    parser.add_argument("--image_dir", type=str, default="T91_General100", help="Path to generator image directory. (Default: `T91_General100`)")
+    parser.add_argument("--inputs_dir", type=str, default="TG191/original", help="Path to input image directory. (Default: `TG191/original`)")
+    parser.add_argument("--output_dir", type=str, default="TG191", help="Path to generator image directory. (Default: `TG191`)")
+    parser.add_argument("--image_size", type=int, default=72, help="Low-resolution image size from raw image. (Default: 72)")
+    parser.add_argument("--step", type=int, default=72, help="Crop image similar to sliding window.  (Default: 72)")
     args = parser.parse_args()
 
     main(args)
