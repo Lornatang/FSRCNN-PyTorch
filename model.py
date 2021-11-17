@@ -14,7 +14,7 @@
 """Realize the model definition function."""
 from math import sqrt
 
-from torch import Tensor
+import torch
 from torch import nn
 
 
@@ -63,11 +63,11 @@ class FSRCNN(nn.Module):
         # Initialize model weights.
         self._initialize_weights()
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self._forward_impl(x)
 
     # Support torch.script function.
-    def _forward_impl(self, x: Tensor) -> Tensor:
+    def _forward_impl(self, x: torch.Tensor) -> torch.Tensor:
         out = self.feature_extraction(x)
         out = self.shrink(out)
         out = self.map(out)
