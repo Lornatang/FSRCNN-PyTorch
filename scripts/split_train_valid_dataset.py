@@ -11,57 +11,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import argparse
+import os
 import random
 import shutil
-import argparse
+
 from tqdm import tqdm
-import os
 
 
 def main(args):
-    train_hr_image_dir = f"{args.image_dir}/train/HR/"
-    train_lrbicx2_image_dir = f"{args.image_dir}/train/LRbicx2"
-    train_lrbicx3_image_dir = f"{args.image_dir}/train/LRbicx3"
-    train_lrbicx4_image_dir = f"{args.image_dir}/train/LRbicx4"
+    train_image_dir = f"{args.inputs_dir}/train"
+    valid_image_dir = f"{args.inputs_dir}/valid"
 
-    valid_hr_image_dir = f"{args.image_dir}/valid/HR"
-    valid_lrbicx2_image_dir = f"{args.image_dir}/valid/LRbicx2"
-    valid_lrbicx3_image_dir = f"{args.image_dir}/valid/LRbicx3"
-    valid_lrbicx4_image_dir = f"{args.image_dir}/valid/LRbicx4"
+    if not os.path.exists(train_image_dir):
+        os.makedirs(train_image_dir)
+    if not os.path.exists(valid_image_dir):
+        os.makedirs(valid_image_dir)
 
-    if not os.path.exists(valid_hr_image_dir):
-        os.makedirs(valid_hr_image_dir)
-    if not os.path.exists(valid_lrbicx2_image_dir):
-        os.makedirs(valid_lrbicx2_image_dir)
-    if not os.path.exists(valid_lrbicx3_image_dir):
-        os.makedirs(valid_lrbicx3_image_dir)
-    if not os.path.exists(valid_lrbicx4_image_dir):
-        os.makedirs(valid_lrbicx4_image_dir)
-
-    # Divide 10% of the data into the validation dataset
-    train_files = os.listdir(train_hr_image_dir)
+    train_files = os.listdir(train_image_dir)
     valid_files = random.sample(train_files, int(len(train_files) * args.valid_samples_ratio))
 
-    for image_file_name in tqdm(valid_files, total=len(valid_files)):
-        train_hr_image_path = f"{train_hr_image_dir}/{image_file_name}"
-        train_lrbicx2_image_path = f"{train_lrbicx2_image_dir}/{image_file_name}"
-        train_lrbicx3_image_path = f"{train_lrbicx3_image_dir}/{image_file_name}"
-        train_lrbicx4_image_path = f"{train_lrbicx4_image_dir}/{image_file_name}"
+    process_bar = tqdm(valid_files, total=len(valid_files))
 
-        valid_hr_image_path = f"{valid_hr_image_dir}/{image_file_name}"
-        valid_lrbicx2_image_path = f"{valid_lrbicx2_image_dir}/{image_file_name}"
-        valid_lrbicx3_image_path = f"{valid_lrbicx3_image_dir}/{image_file_name}"
-        valid_lrbicx4_image_path = f"{valid_lrbicx4_image_dir}/{image_file_name}"
-
-        shutil.copyfile(train_hr_image_path, valid_hr_image_path)
-        shutil.copyfile(train_lrbicx2_image_path, valid_lrbicx2_image_path)
-        shutil.copyfile(train_lrbicx3_image_path, valid_lrbicx3_image_path)
-        shutil.copyfile(train_lrbicx4_image_path, valid_lrbicx4_image_path)
+    for image_file_name in process_bar:
+        train_image_path = f"{train_image_dir}/{image_file_name}"
+        valid_image_path = f"{valid_image_dir}/{image_file_name}"
+        shutil.copyfile(train_image_path, valid_image_path)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Split train and valid dataset scripts (Use SRCNN functions).")
-    parser.add_argument("--image_dir", type=str, default="T91_General100", help="Path to generator image directory. (Default: `T91_General100`)")
+    parser = argparse.ArgumentParser(description="Split train and valid dataset scripts (Use FSRCNN functions).")
+    parser.add_argument("--inputs_dir", type=str, default="TG191", help="Path to input image directory. (Default: ``TG191``)")
     parser.add_argument("--valid_samples_ratio", type=float, default=0.1, help="What percentage of the data is extracted from the training set into the validation set.  (Default: 0.1)")
     args = parser.parse_args()
 
