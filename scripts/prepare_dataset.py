@@ -20,7 +20,7 @@ from tqdm import tqdm
 
 
 def main(args):
-    raw_image_dir = f"{args.output_dir}/GTmod12"
+    raw_image_dir = f"{args.output_dir}/temp"
     new_image_dir = f"{args.output_dir}/train"
 
     if os.path.exists(raw_image_dir):
@@ -30,7 +30,7 @@ def main(args):
     os.makedirs(raw_image_dir)
     os.makedirs(new_image_dir)
 
-    # Carry out data enhancement processing on the data set in the GTmod12 catalog in turn
+    # Carry out data enhancement processing on the data set in the temp catalog in turn
     for file_name in os.listdir(args.inputs_dir):
         raw_image = Image.open(f"{args.inputs_dir}/{file_name}")
 
@@ -54,13 +54,15 @@ def main(args):
                 # Save all images
                 crop_image.save(f"{new_image_dir}/{file_name.split('.')[-2]}_{pos_x}_{pos_y}.{file_name.split('.')[-1]}")
 
+    shutil.rmtree(new_image_dir)
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Prepare database scripts (Use FSRCNN functions).")
+    parser = argparse.ArgumentParser(description="Prepare database scripts.")
     parser.add_argument("--inputs_dir", type=str, default="TG191/original", help="Path to input image directory. (Default: `TG191/original`)")
     parser.add_argument("--output_dir", type=str, default="TG191", help="Path to generator image directory. (Default: `TG191`)")
-    parser.add_argument("--image_size", type=int, default=72, help="Low-resolution image size from raw image. (Default: 72)")
-    parser.add_argument("--step", type=int, default=72, help="Crop image similar to sliding window.  (Default: 72)")
+    parser.add_argument("--image_size", type=int, default=33, help="Low-resolution image size from raw image. (Default: 33)")
+    parser.add_argument("--step", type=int, default=14, help="Crop image similar to sliding window.  (Default: 14)")
     args = parser.parse_args()
 
     main(args)
