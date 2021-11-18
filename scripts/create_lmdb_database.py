@@ -52,7 +52,6 @@ def main(args):
 
         # Process HR to LR image
         image = cv2.resize(image, [image.shape[0] // args.upscale_factor, image.shape[1] // args.upscale_factor], interpolation=cv2.INTER_CUBIC)
-        image = cv2.resize(image, [image.shape[0], image.shape[1]], interpolation=cv2.INTER_CUBIC)
 
         # Label from int to ascii
         image_key_bytes = str(total_sub_image_number).encode("ascii")

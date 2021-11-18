@@ -28,9 +28,9 @@ from model import FSRCNN
 
 def load_dataset() -> [DataLoader, DataLoader]:
     train_datasets = ImageDataset(config.train_image_dir, config.image_size, config.upscale_factor, "train")
-    valid_datasets = ImageDataset(config.valid_image_dir, config.image_size, config.upscale_factor, "valid")
-    train_dataloader = DataLoader(train_datasets, batch_size=config.batch_size, shuffle=True, pin_memory=True)
-    valid_dataloader = DataLoader(valid_datasets, batch_size=config.batch_size, shuffle=False, pin_memory=True)
+    valid_datasets = ImageDataset(config.train_image_dir, config.image_size, config.upscale_factor, "valid")
+    train_dataloader = DataLoader(train_datasets, batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=True)
+    valid_dataloader = DataLoader(valid_datasets, batch_size=config.batch_size, shuffle=False, num_workers=config.num_workers, pin_memory=True)
 
     return train_dataloader, valid_dataloader
 
@@ -95,9 +95,6 @@ def train(model, train_dataloader, criterion, optimizer, epoch, scaler, writer) 
             loss = criterion(sr, hr)
         # Gradient zoom
         scaler.scale(loss).backward()
-        # Gradient clipping
-        scaler.unscale_(optimizer)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         # Update generator weight
         scaler.step(optimizer)
         scaler.update()
@@ -136,7 +133,7 @@ def validate(model, valid_dataloader, criterion, epoch, writer) -> float:
     return avg_psnr
 
 
-def main() -> None:
+def main():
     # Create a folder of super-resolution experiment results
     samples_dir = os.path.join("samples", config.exp_name)
     results_dir = os.path.join("results", config.exp_name)
@@ -174,7 +171,7 @@ def main() -> None:
     # Initialize training to generate network evaluation indicators
     best_psnr = 0.0
 
-    print("Start train FSRCNN model.")
+    print("Start train model.")
     for epoch in range(config.start_epoch, config.epochs):
         train(model, train_dataloader, criterion, optimizer, epoch, scaler, writer)
 
@@ -188,8 +185,8 @@ def main() -> None:
 
     # Save the generator weight under the last Epoch in this stage
     torch.save(model.state_dict(), os.path.join(results_dir, "last.pth"))
-    print("End train FSRCNN model.")
+    print("End train model.")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

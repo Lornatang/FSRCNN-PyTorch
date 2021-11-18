@@ -87,7 +87,7 @@ def main() -> None:
 
         # Only reconstruct the Y channel image data.
         with torch.no_grad():
-            sr_tensor_y = model(lr_tensor_y).clamp_(0.0, 1.0)
+            sr_tensor_y = model(lr_tensor_y)
 
         # Cal PSNR
         total_psnr += 10. * torch.log10(1. / torch.mean((sr_tensor_y - hr_tensor_y) ** 2))
