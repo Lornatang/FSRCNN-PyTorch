@@ -82,7 +82,7 @@ A corresponding transfer strategy is also proposed for fast training and testing
 Modify the contents of the file as follows.
 - line 24: `upscale_factor` change to the magnification you need to enlarge. 
 - line 25: `mode` change Set to valid mode.
-- line 75: `model_path` change weight address after training.
+- line 76: `model_path` change weight address after training.
 
 ## Train
 
@@ -91,22 +91,23 @@ Modify the contents of the file as follows.
 - line 25: `mode` change Set to train mode.
 
 If you want to load weights that you've trained before, modify the contents of the file as follows.
-- line 46: `resume` change to `True`. 
-- line 47: `strict` Transfer learning is set to `False`, incremental learning is set to `True`.
-- line 48: `start_epoch` change number of training iterations in the previous round.
-- line 49: `resume_weight` the weight address that needs to be loaded.
+- line 47: `resume` change to `True`. 
+- line 48: `strict` Transfer learning is set to `False`, incremental learning is set to `True`.
+- line 49: `start_epoch` change number of training iterations in the previous round.
+- line 50: `resume_weight` the weight address that needs to be loaded.
 
 ## Result
 
-Source of original paper results: https://arxiv.org/pdf/1501.00092v3.pdf
+Source of original paper results: https://arxiv.org/pdf/1608.00367v1.pdf
 
 In the following table, the value in `()` indicates the result of the project, and `-` indicates no test.
 
 | Dataset | Scale |       PSNR       |
 | :-----: | :---: | :--------------: |
-|  Set5   |   2   | 36.94(**36.94**) |
-|  Set5   |   3   | 33.06(**32.88**) |
-|  Set5   |   4   | 30.55(**30.58**) |
+|  Set5   |   2   | 37.00(**36.94**) |
+|  Set5   |   3   | 33.16(**32.88**) |
+|  Set5   |   4   | 30.71(**30.58**) |
+|  Set5   |   8   |   -(**30.58**)   |
 
 Low Resolution / Super Resolution / High Resolution
 <span align="center"><img src="assets/result.png"/></span>
