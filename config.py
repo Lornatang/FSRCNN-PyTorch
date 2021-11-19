@@ -39,7 +39,7 @@ if mode == "train":
     valid_lr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_LRbicx{upscale_factor}_lmdb"
     valid_hr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_HR_lmdb"
 
-    image_size = 33
+    image_size = 36
     batch_size = 16
     num_workers = 4
 
