@@ -39,7 +39,7 @@ if mode == "train":
     valid_lr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_LRbicx{upscale_factor}_lmdb"
     valid_hr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_HR_lmdb"
 
-    image_size = 36
+    image_size = 20
     batch_size = 16
     num_workers = 4
 
@@ -69,6 +69,7 @@ if mode == "train":
 # ==============================================================================
 if mode == "valid":
     # Test data address
+    lr_dir = f"data/Set5/LRbicx{upscale_factor}"
     sr_dir = f"results/test/{exp_name}"
     hr_dir = f"data/Set5/GTmod12"
 
