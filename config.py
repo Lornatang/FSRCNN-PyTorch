@@ -69,7 +69,6 @@ if mode == "train":
 # ==============================================================================
 if mode == "valid":
     # Test data address
-    lr_dir = f"data/Set5/LRbicx{upscale_factor}"
     sr_dir = f"results/test/{exp_name}"
     hr_dir = f"data/Set5/GTmod12"
 
