@@ -36,8 +36,8 @@ def main():
         raw_image = Image.open(f"{args.inputs_dir}/{file_name}")
 
         index = 0
-        for scale_ratio in [1.0, 0.9, 0.7, 0.5]:
-            for rotate_angle in [0, 90, 180]:
+        for scale_ratio in [1.0, 0.9, 0.8, 0.7, 0.6]:
+            for rotate_angle in [0, 90, 180, 270]:
                 # Process HR image
                 hr_image = raw_image.resize((int(raw_image.width * scale_ratio), int(raw_image.height * scale_ratio)), Image.BICUBIC) if scale_ratio != 1.0 else raw_image
                 hr_image = hr_image.rotate(rotate_angle) if rotate_angle != 0 else hr_image
@@ -65,8 +65,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare database scripts.")
     parser.add_argument("--inputs_dir", type=str, default="TG191/original", help="Path to input image directory. (Default: `TG191/original`)")
     parser.add_argument("--output_dir", type=str, default="TG191", help="Path to generator image directory. (Default: `TG191`)")
-    parser.add_argument("--image_size", type=int, default=33, help="Low-resolution image size from raw image. (Default: 33)")
-    parser.add_argument("--step", type=int, default=14, help="Crop image similar to sliding window.  (Default: 14)")
+    parser.add_argument("--image_size", type=int, default=32, help="Low-resolution image size from raw image. (Default: 32)")
+    parser.add_argument("--step", type=int, default=32, help="Crop image similar to sliding window.  (Default: 32)")
     args = parser.parse_args()
 
     main()
