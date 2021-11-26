@@ -19,7 +19,7 @@ import shutil
 from tqdm import tqdm
 
 
-def main(args):
+def main():
     train_image_dir = f"{args.inputs_dir}/train"
     valid_image_dir = f"{args.inputs_dir}/valid"
 
@@ -40,9 +40,9 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Split train and valid dataset scripts (Use FSRCNN functions).")
-    parser.add_argument("--inputs_dir", type=str, default="TG191/FSRCNN", help="Path to input image directory. (Default: ``TG191/FSRCNN``)")
+    parser = argparse.ArgumentParser(description="Split train and valid dataset scripts.")
+    parser.add_argument("--inputs_dir", type=str, default="TG191", help="Path to input image directory. (Default: ``TG191``)")
     parser.add_argument("--valid_samples_ratio", type=float, default=0.1, help="What percentage of the data is extracted from the training set into the validation set.  (Default: 0.1)")
     args = parser.parse_args()
 
-    main(args)
+    main()
