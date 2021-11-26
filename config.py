@@ -39,7 +39,7 @@ if mode == "train":
     valid_lr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_LRbicx{upscale_factor}_lmdb"
     valid_hr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_HR_lmdb"
 
-    image_size = 33
+    image_size = 32
     batch_size = 16
     num_workers = 4
 
@@ -49,8 +49,8 @@ if mode == "train":
     start_epoch = 0
     resume_weight = ""
 
-    # Total number of epochs.
-    epochs = 100
+    # Total number of epochs. (SGD: 10000, Adam: 600)
+    epochs = 10000
 
     # SGD optimizer parameter (less training and low PSNR)
     model_optimizer_name = "sgd"
