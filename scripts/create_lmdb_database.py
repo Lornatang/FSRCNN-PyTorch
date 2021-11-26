@@ -20,7 +20,7 @@ import lmdb
 from tqdm import tqdm
 
 
-def main(args):
+def main():
     if os.path.exists(args.lmdb_path):
         shutil.rmtree(args.lmdb_path)
 
@@ -33,7 +33,7 @@ def main(args):
     image = cv2.imread(os.path.abspath(f"{args.image_dir}/{image_file_names[0]}"))
     image = cv2.resize(image, [image.shape[0] // args.upscale_factor, image.shape[1] // args.upscale_factor], interpolation=cv2.INTER_CUBIC)
     _, image_byte = cv2.imencode(f".{image_file_names[0].split('.')[-1]}", image)
-    lmdb_map_size = image_byte.nbytes * total_image_number * 2.5
+    lmdb_map_size = image_byte.nbytes * total_image_number * 3
 
     # Open LMDB write environment
     lmdb_env = lmdb.open(args.lmdb_path, map_size=int(lmdb_map_size))
@@ -75,9 +75,9 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create LMDB database scripts.")
-    parser.add_argument("--image_dir", type=str, default="TG191/FSRCNN/train", help="Path to image directory. (Default: ``TG191/FSRCNN/train``)")
+    parser.add_argument("--image_dir", type=str, default="TG191/train", help="Path to image directory. (Default: ``TG191/train``)")
     parser.add_argument("--lmdb_path", type=str, default="train_lmdb/FSRCNN/TG191_HR_lmdb", help="Path to lmdb database. (Default: ``train_lmdb/FSRCNN/TG191_HR_lmdb``)")
     parser.add_argument("--upscale_factor", type=int, default=1, help="Image zoom factor. (Default: 1)")
     args = parser.parse_args()
 
-    main(args)
+    main()
