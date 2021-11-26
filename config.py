@@ -23,7 +23,7 @@ device = torch.device("cuda", 0)
 cudnn.benchmark = True
 upscale_factor = 2
 mode = "train"
-exp_name = "exp001"
+exp_name = "x2"
 
 # ==============================================================================
 # Training configuration
