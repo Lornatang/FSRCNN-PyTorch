@@ -55,38 +55,29 @@ def main() -> None:
     total_files = len(file_names)
 
     for index in range(total_files):
+        lr_image_path = os.path.join(config.lr_dir, file_names[index])
         sr_image_path = os.path.join(config.sr_dir, file_names[index])
         hr_image_path = os.path.join(config.hr_dir, file_names[index])
 
         print(f"Processing `{os.path.abspath(hr_image_path)}`...")
-        # Make low-resolution images.
+        lr_image = Image.open(lr_image_path).convert("RGB")
+        bic_image = lr_image.resize([int(hr_image.width * config.upscale_factor), int(hr_image.height * config.upscale_factor)], Image.BICUBIC)
         hr_image = Image.open(hr_image_path).convert("RGB")
-        hr_image_width = hr_image.width // config.upscale_factor * config.upscale_factor
-        hr_image_height = hr_image.height // config.upscale_factor * config.upscale_factor
-        hr_image = hr_image.resize([hr_image_width, hr_image_height], Image.BICUBIC)
 
-        lr_image = hr_image.resize([hr_image.width // config.upscale_factor, hr_image.height // config.upscale_factor], Image.BICUBIC)
-        bic_image = lr_image.resize([hr_image.width, hr_image.height], Image.BICUBIC)
-
-        # Extract Y channel lr image data.
+        # Extract Y channel lr image data
         lr_image = np.array(lr_image).astype(np.float32)
-        lr_ycbcr = imgproc.convert_rgb_to_ycbcr(lr_image)
-        lr_y_image = lr_ycbcr[..., 0]
-        lr_y_image /= 255.
-        lr_y_tensor = torch.from_numpy(lr_y_image).to(config.device).unsqueeze(0).unsqueeze(0)
-        lr_y_tensor = lr_y_tensor.half()
+        lr_ycbcr_image = imgproc.convert_rgb_to_ycbcr(lr_image)
+        lr_y_tensor = imgproc.image2tensor(lr_ycbcr_image, range_norm=False, half=True).to(config.device).unsqueeze_(0)
 
-        # Extract Y channel bicubic image data.
+        # Extract Y channel bic image data
         bic_image = np.array(bic_image).astype(np.float32)
-        bic_ycbcr = imgproc.convert_rgb_to_ycbcr(bic_image)
+        bic_ycbcr_image = imgproc.convert_rgb_to_ycbcr(bic_image)
+        bic_y_tensor = imgproc.image2tensor(bic_ycbcr_image, range_norm=False, half=True).to(config.device).unsqueeze_(0)
 
         # Extract Y channel hr image data.
         hr_image = np.array(hr_image).astype(np.float32)
-        hr_ycbcr = imgproc.convert_rgb_to_ycbcr(hr_image)
-        hr_y_image = hr_ycbcr[..., 0]
-        hr_y_image /= 255.
-        hr_y_tensor = torch.from_numpy(hr_y_image).to(config.device).unsqueeze(0).unsqueeze(0)
-        hr_y_tensor = hr_y_tensor.half()
+        hr_ycbcr_image = imgproc.convert_rgb_to_ycbcr(hr_image)
+        hr_y_tensor = imgproc.image2tensor(hr_ycbcr_image, range_norm=False, half=True).to(config.device).unsqueeze_(0)
 
         # Only reconstruct the Y channel image data.
         with torch.no_grad():
@@ -95,8 +86,8 @@ def main() -> None:
         # Cal PSNR
         total_psnr += 10. * torch.log10(1. / torch.mean((sr_y_tensor - hr_y_tensor) ** 2))
 
-        sr_y_image = sr_y_tensor.mul_(255.0).cpu().squeeze_(0).squeeze_(0).numpy()
-        sr_image = np.array([sr_y_image, bic_ycbcr[..., 1], bic_ycbcr[..., 2]]).transpose([1, 2, 0])
+        sr_y_image = imgproc.tensor2image(sr_y_tensor, range_norm=False, half=True)
+        sr_image = np.array([sr_y_image, bic_ycbcr_image[..., 1], bic_ycbcr_image[..., 2]]).transpose([1, 2, 0])
         sr_image = np.clip(imgproc.convert_ycbcr_to_rgb(sr_image), 0.0, 255.0).astype(np.uint8)
         sr_image = Image.fromarray(sr_image)
         sr_image.save(sr_image_path)

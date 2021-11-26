@@ -39,7 +39,7 @@ if mode == "train":
     valid_lr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_LRbicx{upscale_factor}_lmdb"
     valid_hr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_HR_lmdb"
 
-    image_size = 36
+    image_size = 33
     batch_size = 16
     num_workers = 4
 
@@ -49,27 +49,30 @@ if mode == "train":
     start_epoch = 0
     resume_weight = ""
 
-    # Total number of epochs (1e8 iters)
-    epochs = 7500
+    # Total number of epochs. SGD: 72500. Adam: 4500
+    epochs = 72500
 
-    # Model optimizer parameter (less training and low PSNR)
+    # SGD optimizer parameter (less training and low PSNR)
     model_optimizer_name = "sgd"
     model_lr = 1e-3
     model_momentum = 0.9
     model_weight_decay = 1e-4
     model_nesterov = False
 
-    # Modify optimizer parameter (faster training and better PSNR)
+    # Adam optimizer parameter (faster training and better PSNR)
     # model_optimizer_name = "adam"
     # model_lr = 1e-3
     # model_betas = (0.9, 0.999)
+
+    print_frequency = 100
 
 # ==============================================================================
 # Verify configuration
 # ==============================================================================
 if mode == "valid":
     # Test data address
+    lr_dir = f"data/Set5/LRbicx{upscale_factor}"
     sr_dir = f"results/test/{exp_name}"
     hr_dir = f"data/Set5/GTmod12"
 
-    model_path = f"results/{exp_name}/best.pth"
+    model_path = f"results/{exp_name}/last.pth"

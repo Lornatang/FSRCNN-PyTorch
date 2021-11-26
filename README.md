@@ -2,7 +2,8 @@
 
 ## Overview
 
-This repository contains an op-for-op PyTorch reimplementation of [Accelerating the Super-Resolution Convolutional Neural Network](https://arxiv.org/abs/1608.00367v1).
+This repository contains an op-for-op PyTorch reimplementation
+of [Accelerating the Super-Resolution Convolutional Neural Network](https://arxiv.org/abs/1608.00367v1).
 
 ## Table of contents
 
@@ -25,16 +26,15 @@ This repository contains an op-for-op PyTorch reimplementation of [Accelerating 
 If you're new to FSRCNN, here's an abstract straight from the paper:
 
 As a successful deep model applied in image super-resolution (SR), the Super-Resolution Convolutional Neural Network (
-SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration
-quality. However, the high computational cost still hinders it from practical usage that demands real-time performance (
-24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure
-for faster and better SR. We re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution
-layer at the end of the network, then the mapping is learned directly from the original low-resolution image (without
-interpolation) to the high-resolution one. Second, we reformulate the mapping layer by shrinking the input feature
-dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers.
-The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present
-the parameter settings that can achieve real-time performance on a generic CPU while still maintaining good performance.
-A corresponding transfer strategy is also proposed for fast training and testing across different upscaling factors.
+SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration quality. However, the high
+computational cost still hinders it from practical usage that demands real-time performance (
+24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure for faster and better SR. We
+re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution layer at the end of the network, then the mapping is
+learned directly from the original low-resolution image (without interpolation) to the high-resolution one. Second, we reformulate the mapping layer
+by shrinking the input feature dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers.
+The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present the parameter settings that
+can achieve real-time performance on a generic CPU while still maintaining good performance. A corresponding transfer strategy is also proposed for
+fast training and testing across different upscaling factors.
 
 ## Download weights
 
@@ -80,18 +80,21 @@ A corresponding transfer strategy is also proposed for fast training and testing
 ## Test
 
 Modify the contents of the file as follows.
-- line 24: `upscale_factor` change to the magnification you need to enlarge. 
+
+- line 24: `upscale_factor` change to the magnification you need to enlarge.
 - line 25: `mode` change Set to valid mode.
 - line 75: `model_path` change weight address after training.
 
 ## Train
 
 Modify the contents of the file as follows.
-- line 24: `upscale_factor` change to the magnification you need to enlarge. 
+
+- line 24: `upscale_factor` change to the magnification you need to enlarge.
 - line 25: `mode` change Set to train mode.
 
 If you want to load weights that you've trained before, modify the contents of the file as follows.
-- line 47: `resume` change to `True`. 
+
+- line 47: `resume` change to `True`.
 - line 48: `strict` Transfer learning is set to `False`, incremental learning is set to `True`.
 - line 49: `start_epoch` change number of training iterations in the previous round.
 - line 50: `resume_weight` the weight address that needs to be loaded.
@@ -120,16 +123,15 @@ _Chao Dong, Chen Change Loy, Xiaoou Tang_ <br>
 
 **Abstract** <br>
 As a successful deep model applied in image super-resolution (SR), the Super-Resolution Convolutional Neural Network (
-SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration
-quality. However, the high computational cost still hinders it from practical usage that demands real-time performance (
-24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure
-for faster and better SR. We re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution
-layer at the end of the network, then the mapping is learned directly from the original low-resolution image (without
-interpolation) to the high-resolution one. Second, we reformulate the mapping layer by shrinking the input feature
-dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers.
-The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present
-the parameter settings that can achieve real-time performance on a generic CPU while still maintaining good performance.
-A corresponding transfer strategy is also proposed for fast training and testing across different upscaling factors.
+SRCNN) has demonstrated superior performance to the previous hand-crafted models either in speed and restoration quality. However, the high
+computational cost still hinders it from practical usage that demands real-time performance (
+24 fps). In this paper, we aim at accelerating the current SRCNN, and propose a compact hourglass-shape CNN structure for faster and better SR. We
+re-design the SRCNN structure mainly in three aspects. First, we introduce a deconvolution layer at the end of the network, then the mapping is
+learned directly from the original low-resolution image (without interpolation) to the high-resolution one. Second, we reformulate the mapping layer
+by shrinking the input feature dimension before mapping and expanding back afterwards. Third, we adopt smaller filter sizes but more mapping layers.
+The proposed model achieves a speed up of more than 40 times with even superior restoration quality. Further, we present the parameter settings that
+can achieve real-time performance on a generic CPU while still maintaining good performance. A corresponding transfer strategy is also proposed for
+fast training and testing across different upscaling factors.
 
 [[Paper]](https://arxiv.org/pdf/1608.00367v1.pdf)
 
