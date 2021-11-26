@@ -61,7 +61,7 @@ def main() -> None:
 
         print(f"Processing `{os.path.abspath(hr_image_path)}`...")
         lr_image = Image.open(lr_image_path).convert("RGB")
-        bic_image = lr_image.resize([int(hr_image.width * config.upscale_factor), int(hr_image.height * config.upscale_factor)], Image.BICUBIC)
+        bic_image = lr_image.resize([int(lr_image.width * config.upscale_factor), int(lr_image.height * config.upscale_factor)], Image.BICUBIC)
         hr_image = Image.open(hr_image_path).convert("RGB")
 
         # Extract Y channel lr image data
@@ -72,7 +72,6 @@ def main() -> None:
         # Extract Y channel bic image data
         bic_image = np.array(bic_image).astype(np.float32)
         bic_ycbcr_image = imgproc.convert_rgb_to_ycbcr(bic_image)
-        bic_y_tensor = imgproc.image2tensor(bic_ycbcr_image, range_norm=False, half=True).to(config.device).unsqueeze_(0)
 
         # Extract Y channel hr image data.
         hr_image = np.array(hr_image).astype(np.float32)
