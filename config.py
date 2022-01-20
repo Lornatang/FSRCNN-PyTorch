@@ -33,11 +33,6 @@ if mode == "train":
     # Image format
     train_image_dir = f"data/TG191/FSRCNN/train"
     valid_image_dir = f"data/TG191/FSRCNN/valid"
-    # LMDB format
-    train_lr_lmdb_path = f"data/train_lmdb/FSRCNN/TG191_LRbicx{upscale_factor}_lmdb"
-    train_hr_lmdb_path = f"data/train_lmdb/FSRCNN/TG191_HR_lmdb"
-    valid_lr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_LRbicx{upscale_factor}_lmdb"
-    valid_hr_lmdb_path = f"data/valid_lmdb/FSRCNN/TG191_HR_lmdb"
 
     image_size = 32
     batch_size = 16
@@ -49,15 +44,14 @@ if mode == "train":
     start_epoch = 0
     resume_weight = ""
 
-    # Total number of epochs. (SGD: 10000, Adam: 600)
-    epochs = 10000
+    # Total number of epochs. (SGD: 21648, Adam: 1000)
+    epochs = 21648
 
     # SGD optimizer parameter (less training and low PSNR)
     model_optimizer_name = "sgd"
     model_lr = 1e-3
     model_momentum = 0.9
     model_weight_decay = 1e-4
-    model_nesterov = False
 
     # Adam optimizer parameter (faster training and better PSNR)
     # model_optimizer_name = "adam"
