@@ -30,7 +30,6 @@ exp_name = "x2"
 # ==============================================================================
 if mode == "train":
     # Dataset
-    # Image format
     train_image_dir = f"data/TG191/FSRCNN/train"
     valid_image_dir = f"data/TG191/FSRCNN/valid"
 
