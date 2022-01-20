@@ -83,7 +83,7 @@ Modify the contents of the file as follows.
 
 - line 24: `upscale_factor` change to the magnification you need to enlarge.
 - line 25: `mode` change Set to valid mode.
-- line 78: `model_path` change weight address after training.
+- line 71: `model_path` change weight address after training.
 
 ## Train
 
@@ -94,10 +94,10 @@ Modify the contents of the file as follows.
 
 If you want to load weights that you've trained before, modify the contents of the file as follows.
 
-- line 47: `resume` change to `True`.
-- line 48: `strict` Transfer learning is set to `False`, incremental learning is set to `True`.
-- line 49: `start_epoch` change number of training iterations in the previous round.
-- line 50: `resume_weight` the weight address that needs to be loaded.
+- line 41: `resume` change to `True`.
+- line 42: `strict` Transfer learning is set to `False`, incremental learning is set to `True`.
+- line 43: `start_epoch` change number of training iterations in the previous round.
+- line 44: `resume_weight` the weight address that needs to be loaded.
 
 ## Result
 
