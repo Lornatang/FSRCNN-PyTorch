@@ -14,59 +14,50 @@
 import argparse
 import os
 import shutil
+from multiprocessing import Pool
 
 from PIL import Image
 from tqdm import tqdm
 
 
-def main():
-    raw_image_dir = f"{args.output_dir}/temp"
-    new_image_dir = f"{args.output_dir}/train"
+def main(args) -> None:
+    if os.path.exists(args.output_dir):
+        shutil.rmtree(args.output_dir)
+    os.makedirs(args.output_dir)
 
-    if os.path.exists(raw_image_dir):
-        shutil.rmtree(raw_image_dir)
-    if os.path.exists(new_image_dir):
-        shutil.rmtree(new_image_dir)
-    os.makedirs(raw_image_dir)
-    os.makedirs(new_image_dir)
+    # Get all image paths
+    image_file_names = os.listdir(args.images_dir)
 
-    # Carry out data enhancement processing on the data set in the temp catalog in turn
-    file_names = os.listdir(args.inputs_dir)
-    for file_name in tqdm(file_names, total=len(file_names)):
-        raw_image = Image.open(f"{args.inputs_dir}/{file_name}")
+    # Splitting images with multiple threads
+    progress_bar = tqdm(total=len(image_file_names), unit="image", desc="Split")
+    workers_pool = Pool(args.num_workers)
+    for image_file_name in image_file_names:
+        workers_pool.apply_async(worker, args=(image_file_name, args), callback=lambda arg: progress_bar.update(1))
+    workers_pool.close()
+    workers_pool.join()
+    progress_bar.close()
 
-        index = 0
-        for scale_ratio in [1.0, 0.9, 0.8, 0.7, 0.6]:
-            for rotate_angle in [0, 90, 180, 270]:
-                # Process HR image
-                hr_image = raw_image.resize((int(raw_image.width * scale_ratio), int(raw_image.height * scale_ratio)), Image.BICUBIC) if scale_ratio != 1.0 else raw_image
-                hr_image = hr_image.rotate(rotate_angle) if rotate_angle != 0 else hr_image
-                # Save all images
-                hr_image.save(f"{raw_image_dir}/{file_name.split('.')[-2]}_{index:04d}.{file_name.split('.')[-1]}")
+
+def worker(image_file_name, args) -> None:
+    image = Image.open(f"{args.images_dir}/{image_file_name}").convert("RGB")
+
+    index = 1
+    if image.width >= args.image_size and image.height >= args.image_size:
+        for pos_x in range(0, image.width - args.image_size + 1, args.step):
+            for pos_y in range(0, image.height - args.image_size + 1, args.step):
                 index += 1
-    print("Data augment successful.")
-
-    file_names = os.listdir(raw_image_dir)
-    for file_name in tqdm(file_names, total=len(file_names)):
-        # Use PIL to read high-resolution image
-        image = Image.open(f"{raw_image_dir}/{file_name}")
-
-        for pos_x in range(0, image.size[0] - args.image_size + 1, args.step):
-            for pos_y in range(0, image.size[1] - args.image_size + 1, args.step):
                 crop_image = image.crop([pos_x, pos_y, pos_x + args.image_size, pos_y + args.image_size])
                 # Save all images
-                crop_image.save(f"{new_image_dir}/{file_name.split('.')[-2]}_{pos_x}_{pos_y}.{file_name.split('.')[-1]}")
-
-    shutil.rmtree(raw_image_dir)
-    print("Data split successful.")
+                crop_image.save(f"{args.output_dir}/{image_file_name.split('.')[-2]}_{index:04d}.{image_file_name.split('.')[-1]}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare database scripts.")
-    parser.add_argument("--inputs_dir", type=str, default="TG191/original", help="Path to input image directory. (Default: `TG191/original`)")
-    parser.add_argument("--output_dir", type=str, default="TG191", help="Path to generator image directory. (Default: `TG191`)")
-    parser.add_argument("--image_size", type=int, default=32, help="Low-resolution image size from raw image. (Default: 32)")
-    parser.add_argument("--step", type=int, default=32, help="Crop image similar to sliding window.  (Default: 32)")
+    parser.add_argument("--images_dir", type=str, help="Path to input image directory.")
+    parser.add_argument("--output_dir", type=str, help="Path to generator image directory.")
+    parser.add_argument("--image_size", type=int, help="Low-resolution image size from raw image.")
+    parser.add_argument("--step", type=int, help="Crop image similar to sliding window.")
+    parser.add_argument("--num_workers", type=int, help="How many threads to open at the same time.")
     args = parser.parse_args()
 
-    main()
+    main(args)
