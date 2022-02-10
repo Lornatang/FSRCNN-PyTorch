@@ -10,14 +10,6 @@
     - [Google Driver](https://drive.google.com/drive/folders/1iSmgWI7uU3vsHnlE1oOe59CCees0yncU?usp=sharing)
     - [Baidu Driver](https://pan.baidu.com/s/1JsbkfoZqB6HdCBDBS3DOrw) access: `llot`
 
-- LMDB format (train)
-    - [Google Driver](https://drive.google.com/drive/folders/1BPqN08QHk_xFnMJWMS8grfh_vesVs8Jf?usp=sharing)
-    - [Baidu Driver](https://pan.baidu.com/s/1eqeORnKcTmGatx2kAG92-A) access: `llot`
-
-- LMDB format (valid)
-    - [Google Driver](https://drive.google.com/drive/folders/1bYqqKk6NJ9wUfxTH2t_LbdMTB04OUicc?usp=sharing)
-    - [Baidu Driver](https://pan.baidu.com/s/1W34MeEtLY0m-bOrnaveVmw) access: `llot`
-
 ### Download valid dataset
 
 #### Set5
@@ -46,30 +38,7 @@
 - TG191
     - FSRCNN
         - train
-            - ...
         - valid
-            - ...
-```
-
-### LMDB format
-
-```text
-- train_lmdb
-    - FSRCNN
-        - TG191_LRbicx2_lmdb
-            - data.mdb
-            - lock.mdb
-        - TG191_HR_lmdb
-            - data.mdb
-            - lock.mdb
-- valid_lmdb
-    - FSRCNN
-        - TG191_LRbicx2_lmdb
-            - data.mdb
-            - lock.mdb
-        - TG191_HR_lmdb
-            - data.mdb
-            - lock.mdb
 ```
 
 ## Test dataset struct information
