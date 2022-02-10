@@ -37,8 +37,8 @@ fast training and testing across different upscaling factors.
 
 ## Download weights
 
-- [Google Driver](https://drive.google.com/drive/folders/1-Cp0UVqSLBvW-gNV_Xvw5hlj1Ph7f6Oc?usp=sharing)
-- [Baidu Driver](https://pan.baidu.com/s/1mXzvJeHQtSQxmhbBHQYcnA) access:`llot`
+- [Google Driver](https://drive.google.com/drive/folders/1WZN2bO7SN7bkcQH65VYznQR90LDhiNBd?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1yNs4rqIb004-NKEdKBJtYg?pwd=llot)
 
 ## Download datasets
 
