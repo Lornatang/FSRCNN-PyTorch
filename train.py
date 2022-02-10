@@ -28,17 +28,6 @@ from model import FSRCNN
 
 
 def main():
-    # Create a folder of super-resolution experiment results
-    samples_dir = os.path.join("samples", config.exp_name)
-    results_dir = os.path.join("results", config.exp_name)
-    if not os.path.exists(samples_dir):
-        os.makedirs(samples_dir)
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
-
-    # Create training process log file
-    writer = SummaryWriter(os.path.join("samples", "logs", config.exp_name))
-
     print("Load train dataset and valid dataset...")
     train_dataloader, valid_dataloader = load_dataset()
     print("Load train dataset and valid dataset successfully.")
@@ -58,6 +47,17 @@ def main():
     print("Check whether the training weight is restored...")
     resume_checkpoint(model)
     print("Check whether the training weight is restored successfully.")
+
+    # Create a folder of super-resolution experiment results
+    samples_dir = os.path.join("samples", config.exp_name)
+    results_dir = os.path.join("results", config.exp_name)
+    if not os.path.exists(samples_dir):
+        os.makedirs(samples_dir)
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    # Create training process log file
+    writer = SummaryWriter(os.path.join("samples", "logs", config.exp_name))
 
     # Initialize the gradient scaler
     scaler = amp.GradScaler()
@@ -115,24 +115,15 @@ def define_loss() -> [nn.MSELoss, nn.MSELoss]:
 
 
 def define_optimizer(model) -> optim.SGD:
-    if config.model_optimizer_name == "sgd":
-        optimizer = optim.SGD([{"params": model.feature_extraction.parameters()},
-                               {"params": model.shrink.parameters()},
-                               {"params": model.map.parameters()},
-                               {"params": model.expand.parameters()},
-                               {"params": model.deconv.parameters(), "lr": config.model_lr * 0.1}],
-                              lr=config.model_lr,
-                              momentum=config.model_momentum,
-                              weight_decay=config.model_weight_decay,
-                              nesterov=config.model_nesterov)
-    else:
-        optimizer = optim.Adam([{"params": model.feature_extraction.parameters()},
-                                {"params": model.shrink.parameters()},
-                                {"params": model.map.parameters()},
-                                {"params": model.expand.parameters()},
-                                {"params": model.deconv.parameters(), "lr": config.model_lr * 0.1}],
-                               lr=config.model_lr,
-                               betas=config.model_betas)
+    optimizer = optim.SGD([{"params": model.feature_extraction.parameters()},
+                           {"params": model.shrink.parameters()},
+                           {"params": model.map.parameters()},
+                           {"params": model.expand.parameters()},
+                           {"params": model.deconv.parameters(), "lr": config.model_lr * 0.1}],
+                          lr=config.model_lr,
+                          momentum=config.model_momentum,
+                          weight_decay=config.model_weight_decay,
+                          nesterov=config.model_nesterov)
 
     return optimizer
 
@@ -140,7 +131,13 @@ def define_optimizer(model) -> optim.SGD:
 def resume_checkpoint(model):
     if config.resume:
         if config.resume_weight != "":
-            model.load_state_dict(torch.load(config.resume_weight), strict=config.strict)
+            # Get pretrained model state dict
+            pretrained_state_dict = torch.load(config.resume_weight)
+            # Extract the fitted model weights
+            new_state_dict = {k: v for k, v in pretrained_state_dict.items() if k in model.state_dict().items()}
+            # Overwrite the pretrained model weights to the current model
+            model.state_dict().update(new_state_dict)
+            model.load_state_dict(model.state_dict(), strict=config.strict)
 
 
 def train(model, train_dataloader, psnr_criterion, pixel_criterion, optimizer, epoch, scaler, writer) -> None:
