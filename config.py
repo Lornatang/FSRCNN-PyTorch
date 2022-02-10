@@ -18,16 +18,19 @@ from torch.backends import cudnn
 # ==============================================================================
 # General configuration
 # ==============================================================================
+# Random seed to maintain reproducible results
 torch.manual_seed(0)
+# Use GPU for training by default
 device = torch.device("cuda", 0)
+# Turning on when the image size does not change during training can speed up training
 cudnn.benchmark = True
+# Image magnification factor
 upscale_factor = 2
+# Current configuration parameter method
 mode = "train"
-exp_name = "train_fsrcnn_x2"
+# Experiment name, easy to save weights and log files
+exp_name = "fsrcnn_x2"
 
-# ==============================================================================
-# Training configuration
-# ==============================================================================
 if mode == "train":
     # Dataset
     train_image_dir = f"data/TG191/FSRCNN/train"
@@ -46,22 +49,19 @@ if mode == "train":
     # Total number of epochs. (SGD: 10000, Adam: 1000)
     epochs = 10000
 
-    # SGD optimizer parameter (less training and low PSNR)
+    # SGD optimizer parameter (less training and better PSNR)
     model_optimizer_name = "sgd"
     model_lr = 1e-3
     model_momentum = 0.9
     model_weight_decay = 1e-4
 
-    # Adam optimizer parameter (faster training and better PSNR)
+    # Adam optimizer parameter (faster training and low PSNR)
     # model_optimizer_name = "adam"
     # model_lr = 1e-3
     # model_betas = (0.9, 0.999)
 
     print_frequency = 1000
 
-# ==============================================================================
-# Verify configuration
-# ==============================================================================
 if mode == "valid":
     # Test data address
     lr_dir = f"data/Set5/LRbicx{upscale_factor}"
