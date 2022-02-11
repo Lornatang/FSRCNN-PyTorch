@@ -48,7 +48,7 @@ def worker(image_file_name, args) -> None:
         for rotate_angle in [0, 90, 180, 270]:
             index += 1
             new_image = image.resize((int(image.width * scale_ratio), int(image.height * scale_ratio)), resample=Image.BICUBIC)
-            new_image = new_image.rotate(rotate_angle, expand=True)
+            new_image = new_image.rotate(rotate_angle)
             # Save all images
             new_image.save(f"{args.output_dir}/{image_file_name.split('.')[-2]}_{index:02d}.{image_file_name.split('.')[-1]}")
 
