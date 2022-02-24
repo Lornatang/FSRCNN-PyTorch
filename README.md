@@ -12,8 +12,6 @@ This repository contains an op-for-op PyTorch reimplementation of [Accelerating 
     - [About Accelerating the Super-Resolution Convolutional Neural Network](#about-accelerating-the-super-resolution-convolutional-neural-network)
     - [Download weights](#download-weights)
     - [Download datasets](#download-datasets)
-        - [Download train dataset](#download-train-dataset)
-        - [Download valid dataset](#download-valid-dataset)
     - [Test](#test)
     - [Train](#train)
     - [Result](#result)
@@ -42,61 +40,30 @@ fast training and testing across different upscaling factors.
 
 ## Download datasets
 
-### Download train dataset
+Contains DIV2K, DIV8K, Flickr2K, OST, T91, Set5, Set14, BSDS100 and BSDS200, etc.
 
-#### TG191
-
-- Image format
-    - [Google Driver](https://drive.google.com/drive/folders/1iSmgWI7uU3vsHnlE1oOe59CCees0yncU?usp=sharing)
-    - [Baidu Driver](https://pan.baidu.com/s/1JsbkfoZqB6HdCBDBS3DOrw) access: `llot`
-
-- LMDB format (train)
-    - [Baidu Driver](https://pan.baidu.com/s/1eqeORnKcTmGatx2kAG92-A) access: `llot`
-
-- LMDB format (valid)
-    - [Baidu Driver](https://pan.baidu.com/s/1W34MeEtLY0m-bOrnaveVmw) access: `llot`
-
-### Download valid dataset
-
-#### Set5
-
-- Image format
-    - [Google Driver](https://drive.google.com/file/d/1GtQuoEN78q3AIP8vkh-17X90thYp_FfU/view?usp=sharing)
-    - [Baidu Driver](https://pan.baidu.com/s/1dlPcpwRPUBOnxlfW5--S5g) access:`llot`
-
-#### Set14
-
-- Image format
-    - [Google Driver](https://drive.google.com/file/d/1CzwwAtLSW9sog3acXj8s7Hg3S7kr2HiZ/view?usp=sharing)
-    - [Baidu Driver](https://pan.baidu.com/s/1KBS38UAjM7bJ_e6a54eHaA) access:`llot`
-
-#### BSD200
-
-- Image format
-    - [Google Driver](https://drive.google.com/file/d/1cdMYTPr77RdOgyAvJPMQqaJHWrD5ma5n/view?usp=sharing)
-    - [Baidu Driver](https://pan.baidu.com/s/1xahPw4dNNc3XspMMOuw1Bw) access:`llot`
+- [Google Driver](https://drive.google.com/drive/folders/1A6lzGeQrFMxPqJehK9s37ce-tPDj20mD?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1o-8Ty_7q6DiS3ykLU09IVg?pwd=llot)
 
 ## Test
 
 Modify the contents of the file as follows.
 
-- line 28: `upscale_factor` change to the magnification you need to enlarge.
-- line 30: `mode` change Set to valid mode.
-- line 66: `model_path` change weight address after training.
+- line 30: `upscale_factor` change to the magnification you need to enlarge.
+- line 32: `mode` change Set to valid mode.
+- line 67: `model_path` change weight address after training.
 
 ## Train
 
 Modify the contents of the file as follows.
 
-- line 28: `upscale_factor` change to the magnification you need to enlarge.
-- line 30: `mode` change Set to train mode.
+- line 30: `upscale_factor` change to the magnification you need to enlarge.
+- line 32: `mode` change Set to train mode.
 
 If you want to load weights that you've trained before, modify the contents of the file as follows.
 
-- line 44: `resume` change to `True`.
-- line 45: `strict` Transfer learning is set to `False`, incremental learning is set to `True`.
-- line 46: `start_epoch` change number of training iterations in the previous round.
-- line 47: `resume_weight` the weight address that needs to be loaded.
+- line 47: `start_epoch` change number of training iterations in the previous round.
+- line 48: `resume` change weight address that needs to be loaded.
 
 ## Result
 
@@ -106,9 +73,9 @@ In the following table, the value in `()` indicates the result of the project, a
 
 | Dataset | Scale |       PSNR       |
 |:-------:|:-----:|:----------------:|
-|  Set5   |   2   | 37.00(**37.16**) |
-|  Set5   |   3   | 33.16(**33.09**) |
-|  Set5   |   4   | 30.71(**30.70**) |
+|  Set5   |   2   | 36.94(**37.09**) |
+|  Set5   |   3   | 33.06(**33.06**) |
+|  Set5   |   4   | 30.55(**30.66**) |
 
 Low Resolution / Super Resolution / High Resolution
 <span align="center"><img src="assets/result.png"/></span>
@@ -131,7 +98,7 @@ The proposed model achieves a speed up of more than 40 times with even superior 
 can achieve real-time performance on a generic CPU while still maintaining good performance. A corresponding transfer strategy is also proposed for
 fast training and testing across different upscaling factors.
 
-[[Paper]](https://arxiv.org/pdf/1608.00367v1.pdf)
+[[Paper]](https://arxiv.org/pdf/1608.00367v1.pdf) [[Author's implements(Caffe)]](https://drive.google.com/open?id=0B7tU5Pj1dfCMWjhhaE1HR3dqcGs)
 
 ```bibtex
 @article{DBLP:journals/corr/DongLT16,
