@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Realize the parameter configuration function of dataset, model, training and verification code."""
 import random
 
 import numpy as np
@@ -37,7 +36,8 @@ if mode == "train":
     # Dataset
     train_image_dir = f"data/T91/FSRCNN/train"
     valid_image_dir = f"data/T91/FSRCNN/valid"
-    test_image_dir = "data/Set5/GTmod12"
+    test_lr_image_dir = f"data/Set5/LRbicx{upscale_factor}"
+    test_hr_image_dir = f"data/Set5/GTmod12"
 
     image_size = 20
     batch_size = 16
